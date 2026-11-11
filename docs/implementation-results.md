@@ -284,3 +284,19 @@
   - CloudFormation YAML structure check: `13` resources and `4` outputs validated.
   - `python -m ruff check src tests`: `All checks passed!`.
   - `python -m pytest -v`: `42 passed` (verified after final edits).
+- **Commit**: `614ba93` (`Phase 14: AWS cloud deployment infrastructure and production configuration`)
+
+---
+
+## Phase 15 — Monitoring
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `config/monitoring_thresholds.yaml`
+  - `src/monitoring/__init__.py`, `src/monitoring/data_drift.py` (KS test, PSI, Chi-squared + drift reports & PSI chart), `src/monitoring/prediction_drift.py` (distribution shift + robust anomaly flags), `src/monitoring/performance_monitor.py` (JSONL tracking + threshold alerting), `src/monitoring/dashboard.py` (HTML dashboard)
+  - `tests/unit/test_monitoring.py`
+  - Sample baseline vs. test monitoring outputs under `reports/monitoring/`
+- **Verification**:
+  - `python -m ruff check src tests`: `All checks passed!`.
+  - `python -m pytest tests/unit/test_monitoring.py -v`: `2 passed` (verified drift alerts trigger on shifted data & degraded metrics).
+  - Baseline vs. held-out test check (`1,000` samples each): `Data drift detected: False`, `Pred drift: False`, `Alert: False`; generated `reports/monitoring/monitoring_dashboard.html` and drift report artifacts.

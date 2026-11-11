@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>House Price Prediction — Monitoring Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; background: #f7fafc; color: #1a202c; }
+    .cards { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem 1.25rem; flex: 1; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th, td { padding: 0.6rem; border: 1px solid #e2e8f0; text-align: left; }
+    th { background: #edf2f7; }
+  </style>
+</head>
+<body>
+  <h1>House Price Prediction — Production Monitoring Dashboard</h1>
+  <div class="cards">
+    <div class="card">
+      <h3>Data Drift</h3>
+      <p><strong>STABLE</strong> (0 / 7 drifted)</p>
+    </div>
+    <div class="card">
+      <h3>Prediction Drift</h3>
+      <p><strong>STABLE</strong> (PSI=0.0171, Shift=1.29%)</p>
+    </div>
+    <div class="card">
+      <h3>Model Performance</h3>
+      <p><strong>HEALTHY</strong> (R²=0.8143, MAE=₹2,147,193)</p>
+      <p>All metrics within thresholds.</p>
+    </div>
+  </div>
+  <h2>Feature Drift Details</h2>
+  <table>
+    <thead><tr><th>Feature</th><th>Kind</th><th>Statistic</th><th>p-value</th><th>PSI</th><th>Drifted</th></tr></thead>
+    <tbody><tr><td>effective_area_sqft</td><td>numeric</td><td>0.0410</td><td>0.370120</td><td>0.0109</td><td>No</td></tr>
+<tr><td>bathroom_count</td><td>numeric</td><td>0.0090</td><td>1.000000</td><td>0.0010</td><td>No</td></tr>
+<tr><td>balcony_count</td><td>numeric</td><td>0.0120</td><td>1.000000</td><td>0.0013</td><td>No</td></tr>
+<tr><td>parking_count</td><td>numeric</td><td>0.0260</td><td>0.888173</td><td>0.0028</td><td>No</td></tr>
+<tr><td>Transaction</td><td>categorical</td><td>0.7890</td><td>0.374410</td><td>0.0008</td><td>No</td></tr>
+<tr><td>Furnishing</td><td>categorical</td><td>7.1047</td><td>0.068635</td><td>0.0054</td><td>No</td></tr>
+<tr><td>area_type</td><td>categorical</td><td>2.3388</td><td>0.126189</td><td>0.0023</td><td>No</td></tr></tbody>
+  </table>
+</body>
+</html>

@@ -1,0 +1,65 @@
+{
+  "overall_drift_detected": false,
+  "drifted_feature_count": 0,
+  "total_features_checked": 7,
+  "drifted_feature_share": 0.0,
+  "drifted_features": [],
+  "feature_results": [
+    {
+      "feature": "effective_area_sqft",
+      "kind": "numeric",
+      "statistic": 0.041,
+      "p_value": 0.37012,
+      "psi": 0.01095,
+      "drifted": false
+    },
+    {
+      "feature": "bathroom_count",
+      "kind": "numeric",
+      "statistic": 0.009,
+      "p_value": 1.0,
+      "psi": 0.00101,
+      "drifted": false
+    },
+    {
+      "feature": "balcony_count",
+      "kind": "numeric",
+      "statistic": 0.012,
+      "p_value": 1.0,
+      "psi": 0.00128,
+      "drifted": false
+    },
+    {
+      "feature": "parking_count",
+      "kind": "numeric",
+      "statistic": 0.026,
+      "p_value": 0.888173,
+      "psi": 0.0028,
+      "drifted": false
+    },
+    {
+      "feature": "Transaction",
+      "kind": "categorical",
+      "statistic": 0.789,
+      "p_value": 0.37441,
+      "psi": 0.00077,
+      "drifted": false
+    },
+    {
+      "feature": "Furnishing",
+      "kind": "categorical",
+      "statistic": 7.1047,
+      "p_value": 0.068635,
+      "psi": 0.00538,
+      "drifted": false
+    },
+    {
+      "feature": "area_type",
+      "kind": "categorical",
+      "statistic": 2.3388,
+      "p_value": 0.126189,
+      "psi": 0.00232,
+      "drifted": false
+    }
+  ]
+}
