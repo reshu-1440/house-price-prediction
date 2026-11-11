@@ -165,3 +165,22 @@
 - **Verification**:
   - `python -m pytest -v`: `29 passed`.
   - `python -m src.models.hyperparameter_tuning`: exited `0`, generated `config/hyperparameters.yaml` and `reports/tuning_results.md`; every tuned model beat its Phase 6 default.
+- **Commit**: `debea12` (`Phase 7: Hyperparameter optimization with cross-validation and experiment tracking`)
+
+---
+
+## Phase 8 — Model Evaluation
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `src/models/evaluate.py` (`compute_metrics`, `plot_residuals`, `plot_actual_vs_predicted`, `error_segmentation`, `plot_feature_importance`, `generate_evaluation_report`, `run_model_evaluation`)
+  - `tests/unit/test_evaluate.py`
+  - `reports/model_evaluation.md`, `reports/evaluation_metrics.json`, and 3 diagnostic figures (`residuals.png`, `actual_vs_predicted.png`, `feature_importance.png`) in `reports/figures/`
+- **Verified Test Evaluation (`lightgbm_tuned`, `12,892` test rows)**:
+  - `R² = 0.8128`, `Adjusted R² = 0.8121`
+  - `MAE = ₹2,206,793.51`, `Median AE = ₹1,011,185.35`, `RMSE = ₹4,827,094.43`
+  - `MAPE = 22.12%`, `Within ±20% = 58.38%`
+  - Error segmentation confirmed higher accuracy on `New Property` (R²=`0.8348`, MAPE=`18.80%`) vs `Resale` (R²=`0.7985`, MAPE=`23.29%`), and top feature drivers `area_per_bhk`, `location_target_enc`, `effective_area_sqft`, `floor_ratio`.
+- **Verification**:
+  - `python -m pytest -v`: `31 passed`.
+  - `python -m src.models.evaluate`: exited `0`, generated Markdown, JSON, and 3 diagnostic PNG charts.

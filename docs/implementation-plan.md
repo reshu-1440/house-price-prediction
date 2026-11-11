@@ -16,7 +16,7 @@
 | 5 | Data Splitting & Validation | `Completed` | Phase 3, 4 | `src/data/split.py`, `data/processed/` |
 | 6 | Model Development | `Completed` | Phase 4, 5 | `src/models/train.py`, `src/models/predict.py`, `reports/model_comparison.md` |
 | 7 | Hyperparameter Optimization | `Completed` | Phase 6 | `src/models/hyperparameter_tuning.py`, `config/hyperparameters.yaml`, `reports/tuning_results.md` |
-| 8 | Model Evaluation | `Pending` | Phase 6, 7 | `src/models/evaluate.py`, `reports/model_evaluation.md`, `reports/figures/` |
+| 8 | Model Evaluation | `Completed` | Phase 6, 7 | `src/models/evaluate.py`, `reports/model_evaluation.md`, `reports/figures/` |
 | 9 | MLflow & Model Management | `Pending` | Phase 6–8 | `src/models/mlflow_tracking.py`, `mlflow_experiments/` |
 | 10 | ML Pipeline Development | `Pending` | Phase 3–9 | `src/pipeline/training_pipeline.py`, `src/pipeline/inference_pipeline.py`, `models/` |
 | 11 | Backend Development | `Pending` | Phase 10 | `src/api/{app,schemas,dependencies,middleware}.py`, `docs/api-documentation.md` |

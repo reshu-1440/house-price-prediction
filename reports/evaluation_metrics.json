@@ -1,0 +1,56 @@
+{
+  "model": "lightgbm_tuned",
+  "test_samples": 12892,
+  "feature_count": 50,
+  "metrics": {
+    "mae": 2206793.5062,
+    "rmse": 4827094.4272,
+    "r2": 0.8128,
+    "mape": 22.1217,
+    "median_ae": 1011185.3452,
+    "within_20pct": 58.3773,
+    "adjusted_r2": 0.8121
+  },
+  "top_10_features": [
+    {
+      "feature": "area_per_bhk",
+      "importance": 6949.0
+    },
+    {
+      "feature": "location_target_enc",
+      "importance": 6103.0
+    },
+    {
+      "feature": "effective_area_sqft",
+      "importance": 5802.0
+    },
+    {
+      "feature": "floor_ratio",
+      "importance": 4852.0
+    },
+    {
+      "feature": "location_log_target_enc",
+      "importance": 4685.0
+    },
+    {
+      "feature": "total_floors",
+      "importance": 4519.0
+    },
+    {
+      "feature": "location_freq",
+      "importance": 4433.0
+    },
+    {
+      "feature": "bhk_x_log_area",
+      "importance": 3327.0
+    },
+    {
+      "feature": "floor_number",
+      "importance": 2585.0
+    },
+    {
+      "feature": "total_rooms_proxy",
+      "importance": 1818.0
+    }
+  ]
+}

@@ -24,3 +24,9 @@
 - `Data/data_check.py` and `Data/data_cleaning.py` use relative path `"house_prices.csv"`, requiring execution inside `Data/`.
 - `Data/data_cleaning.py` restricts analysis to 3 cities (`new-delhi`, `bangalore`, `ahmedabad`) and performs no area parsing, deduplication, or outlier filtering.
 - Both scripts are exploratory prototypes and will be superseded by modular code in `src/data/` during Phases 1–3 (kept or archived cleanly without breaking git history).
+
+---
+
+## 3. Modeling Limitations Observed in Evaluation (Phase 8)
+
+- **Lack of Sub-City Micro-Locality / Pincode Features**: `location` operates at city granularity (81 cities); luxury properties (`> 2.5 Cr`, `n=857` test rows) and large metro markets (`gurgaon`, `new-delhi`, `bangalore`, `chennai`) exhibit higher absolute MAE (`₹3.2M–₹10.9M`) due to unmodeled neighborhood prestige and builder signals buried inside free-text `Title`/`Description`/`Society`.
