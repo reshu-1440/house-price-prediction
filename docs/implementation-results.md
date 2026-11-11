@@ -220,3 +220,17 @@
   - `python -m pytest -v`: `33 passed`.
   - `python -m src.pipeline.training_pipeline`: trained end-to-end from `Data/house_prices.csv` (`51,568` train / `12,892` test, `50` features across `81` cities), achieved `R² = 0.8128`, `MAE = ₹2,206,793.51`, `RMSE = ₹4,827,094.43`, saved `models/house_price_pipeline.joblib` & `models/metadata.json`.
   - Cross-process `load_pipeline` + `predict_from_raw` on raw Bangalore 3 BHK `1500 sqft` dict returned `INR 14,742,100` (`147.42 Lac`).
+- **Commit**: `f5ae07e` (`Phase 10: Reproducible ML pipeline with preprocessing and inference`)
+
+---
+
+## Phase 11 — Backend Development
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `src/api/__init__.py`, `src/api/schemas.py`, `src/api/dependencies.py`, `src/api/middleware.py`, `src/api/app.py`
+  - `tests/unit/test_schemas.py`
+  - Updated `docs/api-documentation.md`, `requirements.txt`, and `setup.py` (`fastapi`, `uvicorn`, `pydantic`, `httpx`)
+- **Verification**:
+  - `python -m pytest -v`: `35 passed` (including `TestClient` tests for `/health`, `/model/info`, `/predict`, `/predict/batch`, `422` validation errors, and `503` unloaded-model behavior).
+  - Live `uvicorn` HTTP server probe (`127.0.0.1:8012`): `/health` -> `200` (`healthy`), `/predict` -> `200` (`₹1.34 Cr`), `/predict/batch` -> `200` (`count=2`), invalid payload -> `422`.

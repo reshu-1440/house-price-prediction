@@ -22,5 +22,8 @@ setup(
         "lightgbm>=4.5.0",
         "optuna>=4.0.0",
         "mlflow>=3.0.0",
+        "fastapi>=0.115.0",
+        "uvicorn>=0.32.0",
+        "pydantic>=2.9.0",
     ],
 )

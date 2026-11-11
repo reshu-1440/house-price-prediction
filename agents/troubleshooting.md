@@ -15,3 +15,6 @@
 
 ## 4. Python 3.13 Package Compatibility
 - Check wheel availability when adding ML packages (`scikit-learn`, `xgboost`, `lightgbm`, `optuna`, `mlflow`, `fastapi`) in Phases 1–9; record any version constraints discovered in [`docs/known-issues.md`](../docs/known-issues.md).
+
+## 5. Windows Sandbox & Loopback (`asyncio` / `TestClient` / `uvicorn`)
+- On Windows, `asyncio`, `uvicorn`, and `starlette.testclient.TestClient` internally create local TCP loopback `socket.socketpair()` connections, which block in restricted sandbox mode. Run `uvicorn` and API `TestClient` tests outside the sandbox (`BypassSandbox: true`).
