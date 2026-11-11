@@ -59,3 +59,10 @@
 - **Context**: Target `Price_in_rupees` is strongly right-skewed (`3.5 Lac` to `12.9 Cr`), causing raw linear/MSE objectives to focus disproportionately on luxury outliers and occasionally predict negative prices for linear models.
 - **Decision**: Wrap regression algorithms with `sklearn.compose.TransformedTargetRegressor(func=np.log1p, inverse_func=np.expm1)` while preserving standard INR predictions via `.predict()`.
 - **Consequences**: Stabilizes variance across metro/non-metro price tiers, improves relative percentage accuracy (`MAPE`), and guarantees strictly positive predictions.
+
+## TD-009: Select Tuned LightGBM as Primary Model Candidate
+- **Date**: 2026-11-12 (Phase 7)
+- **Status**: Accepted
+- **Context**: Three-fold CV hyperparameter optimization across `XGBoost` (Optuna), `LightGBM` (Optuna), and `RandomForest` (RandomizedSearchCV) produced `lightgbm` as highest in both CV R² (`0.8082`) and held-out test R² (`0.8128`), with lowest test MAE (`2,206,793.51 INR`), lowest RMSE (`4,827,094.43 INR`), and smallest train-test gap (`0.1190`).
+- **Decision**: Persist tuned parameters in `config/hyperparameters.yaml` with `best_model: lightgbm` for Phase 8 evaluation and Phase 10 pipeline serialization.
+- **Consequences**: Provides fast training/inference latency with top generalization across all 81 cities, while retaining tuned `xgboost` and `random_forest` configs as fallback/challenger options.

@@ -20,5 +20,6 @@ setup(
         "joblib>=1.4.0",
         "xgboost>=2.1.0",
         "lightgbm>=4.5.0",
+        "optuna>=4.0.0",
     ],
 )

@@ -145,3 +145,23 @@
 - **Verification**:
   - `python -m pytest -v`: `28 passed`.
   - `python -m src.models.train`: exited `0`, generated `reports/model_comparison.md` and `reports/figures/model_comparison.png`.
+- **Commit**: `e3c684a` (`Phase 6: Model development with baseline and multiple regression algorithms`)
+
+---
+
+## Phase 7 — Hyperparameter Optimization
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `src/models/hyperparameter_tuning.py` (`cross_validate_model`, `tune_random_forest`, `tune_gradient_boosting`, `save_best_params`, `run_hyperparameter_tuning`)
+  - `config/hyperparameters.yaml`
+  - `reports/tuning_results.md`
+  - `tests/unit/test_tuning.py`
+  - Updated `requirements.txt` and `setup.py` with `optuna>=4.0.0`
+- **Verified Tuning Results (3-fold CV on `51,568` train / evaluated on `12,892` test)**:
+  - `lightgbm` (Optuna, 12 trials): CV R² = `0.8082`, Train R² = `0.9318`, **Test R² = `0.8128`**, Train-Test Gap = `0.1190`, Test MAE = `2,206,793.51 INR`, Test RMSE = `4,827,094.43 INR`, Test MAPE = `22.12%`
+  - `xgboost` (Optuna, 12 trials): CV R² = `0.8014`, Train R² = `0.9363`, Test R² = `0.8102`, Train-Test Gap = `0.1260`, Test MAE = `2,212,525.78 INR`, Test RMSE = `4,859,924.57 INR`, Test MAPE = `22.09%`
+  - `random_forest` (RandomizedSearchCV, 6 iters): CV R² = `0.7915`, Train R² = `0.9389`, Test R² = `0.8019`, Train-Test Gap = `0.1370`, Test MAE = `2,235,657.22 INR`
+- **Verification**:
+  - `python -m pytest -v`: `29 passed`.
+  - `python -m src.models.hyperparameter_tuning`: exited `0`, generated `config/hyperparameters.yaml` and `reports/tuning_results.md`; every tuned model beat its Phase 6 default.
