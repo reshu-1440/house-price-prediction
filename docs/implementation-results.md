@@ -202,3 +202,21 @@
   - `python -m src.models.mlflow_tracking`:
     - Logged `xgboost` (`eb91eef55fa34382bef1fd94bcefef91`) and `lightgbm` (`7e76ad5be3084641bfdfc8fe8f7ae492`) runs with model signatures and evaluation artifacts to `mlflow_experiments/mlflow.db`.
     - Registered `house_price_regressor` version `1`, promoted alias `@production`, and verified `load_production_model` predictions matched original predictions (`registry_verified: true`).
+- **Commit**: `0cc4de8` (`Phase 9: MLflow integration with experiment tracking and model registry`)
+
+---
+
+## Phase 10 — ML Pipeline Development
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `src/pipeline/__init__.py`
+  - `src/pipeline/training_pipeline.py` (`build_preprocessor`, `build_training_pipeline`, `save_pipeline`, `load_pipeline`, `run_training_pipeline`)
+  - `src/pipeline/inference_pipeline.py` (`predict_from_raw`)
+  - `src/features/transformers.py` (added module-scoped `RawInputNormalizer` & `FeatureMatrixAligner` for safe cross-process joblib serialization)
+  - `models/metadata.json` (plus gitignored `models/house_price_pipeline.joblib`)
+  - `tests/unit/test_pipeline.py`
+- **Verification**:
+  - `python -m pytest -v`: `33 passed`.
+  - `python -m src.pipeline.training_pipeline`: trained end-to-end from `Data/house_prices.csv` (`51,568` train / `12,892` test, `50` features across `81` cities), achieved `R² = 0.8128`, `MAE = ₹2,206,793.51`, `RMSE = ₹4,827,094.43`, saved `models/house_price_pipeline.joblib` & `models/metadata.json`.
+  - Cross-process `load_pipeline` + `predict_from_raw` on raw Bangalore 3 BHK `1500 sqft` dict returned `INR 14,742,100` (`147.42 Lac`).

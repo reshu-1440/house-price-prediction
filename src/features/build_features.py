@@ -8,6 +8,7 @@ import pandas as pd
 
 from src.features.transformers import (
     DEFAULT_CATEGORICAL_COLUMNS,
+    NUMERIC_FEATURE_COLUMNS,
     AreaFeatureBuilder,
     BHKExtractor,
     CategoricalEncoder,
@@ -17,32 +18,6 @@ from src.features.transformers import (
 from src.utils.config import get_logger
 
 logger = get_logger(__name__)
-
-NUMERIC_FEATURE_COLUMNS: tuple[str, ...] = (
-    "effective_area_sqft",
-    "log_effective_area",
-    "bathroom_count",
-    "balcony_count",
-    "parking_count",
-    "bhk",
-    "is_studio",
-    "is_penthouse",
-    "floor_number",
-    "total_floors",
-    "floor_ratio",
-    "is_ground_floor",
-    "is_top_floor",
-    "area_per_bhk",
-    "bathroom_per_bhk",
-    "total_rooms_proxy",
-    "bhk_x_log_area",
-    "is_carpet_area",
-    "has_society",
-    "has_overlooking",
-    "location_target_enc",
-    "location_log_target_enc",
-    "location_freq",
-)
 
 
 def extract_bhk(df: pd.DataFrame) -> pd.DataFrame:

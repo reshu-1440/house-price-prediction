@@ -11,6 +11,12 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import OneHotEncoder
 
+from src.data.cleaning import (
+    handle_missing_values,
+    parse_area_columns,
+    parse_car_parking,
+)
+
 DEFAULT_CATEGORICAL_COLUMNS: tuple[str, ...] = (
     "Transaction",
     "Status",
@@ -19,6 +25,32 @@ DEFAULT_CATEGORICAL_COLUMNS: tuple[str, ...] = (
     "facing",
     "area_type",
     "parking_type",
+)
+
+NUMERIC_FEATURE_COLUMNS: tuple[str, ...] = (
+    "effective_area_sqft",
+    "log_effective_area",
+    "bathroom_count",
+    "balcony_count",
+    "parking_count",
+    "bhk",
+    "is_studio",
+    "is_penthouse",
+    "floor_number",
+    "total_floors",
+    "floor_ratio",
+    "is_ground_floor",
+    "is_top_floor",
+    "area_per_bhk",
+    "bathroom_per_bhk",
+    "total_rooms_proxy",
+    "bhk_x_log_area",
+    "is_carpet_area",
+    "has_society",
+    "has_overlooking",
+    "location_target_enc",
+    "location_log_target_enc",
+    "location_freq",
 )
 
 
@@ -321,3 +353,126 @@ class CategoricalEncoder(BaseEstimator, TransformerMixin):
         encoded_df = pd.DataFrame(encoded, columns=self.encoded_feature_names_, index=out.index)
         out = out.drop(columns=self.active_columns_)
         return pd.concat([out, encoded_df], axis=1)
+
+
+class RawInputNormalizer(BaseEstimator, TransformerMixin):
+    """Normalize either cleaned rows or raw property input dictionaries into canonical columns."""
+
+    def __init__(self, default_bathroom_median: float = 2.0) -> None:
+        self.default_bathroom_median = default_bathroom_median
+
+    def _normalize_frame(self, X: pd.DataFrame) -> pd.DataFrame:
+        out = X.copy()
+
+        if "effective_area_sqft" not in out.columns:
+            if "area_sqft" in out.columns:
+                out["effective_area_sqft"] = pd.to_numeric(
+                    out["area_sqft"], errors="coerce"
+                ).astype("float64")
+                if "area_type" not in out.columns:
+                    out["area_type"] = "carpet"
+            else:
+                out = parse_area_columns(out)
+        else:
+            out["effective_area_sqft"] = pd.to_numeric(
+                out["effective_area_sqft"], errors="coerce"
+            ).astype("float64")
+            if "area_type" not in out.columns:
+                out["area_type"] = "carpet"
+
+        if "Title" not in out.columns:
+            if "bhk" in out.columns:
+                bhk_series = pd.to_numeric(out["bhk"], errors="coerce").fillna(2).astype(int)
+                out["Title"] = bhk_series.astype(str) + " BHK Property"
+            else:
+                out["Title"] = "2 BHK Property"
+        elif "bhk" in out.columns:
+            bhk_vals = pd.to_numeric(out["bhk"], errors="coerce")
+            missing_title = out["Title"].isna() | (out["Title"].astype(str).str.strip() == "")
+            out["Title"] = out["Title"].where(
+                ~missing_title,
+                bhk_vals.fillna(2).astype(int).astype(str) + " BHK Property",
+            )
+
+        if "Floor" not in out.columns:
+            if "floor_number" in out.columns and "total_floors" in out.columns:
+                f_num = pd.to_numeric(out["floor_number"], errors="coerce").fillna(1).astype(int)
+                t_num = pd.to_numeric(out["total_floors"], errors="coerce").fillna(4).astype(int)
+                out["Floor"] = f_num.astype(str) + " out of " + t_num.astype(str)
+            else:
+                out["Floor"] = np.nan
+
+        if "parking_count" not in out.columns or "parking_type" not in out.columns:
+            out = parse_car_parking(out)
+
+        if "bathroom_count" not in out.columns and "bathroom" in out.columns:
+            out["Bathroom"] = out["bathroom"]
+        if "balcony_count" not in out.columns and "balcony" in out.columns:
+            out["Balcony"] = out["balcony"]
+
+        if "location" not in out.columns:
+            out["location"] = "unknown"
+
+        for cat_col, default_val in (
+            ("Transaction", "Resale"),
+            ("Status", "Ready to Move"),
+            ("Furnishing", "Unfurnished"),
+            ("Ownership", "Freehold"),
+            ("facing", "Missing"),
+            ("overlooking", "Missing"),
+            ("Society", "Missing"),
+        ):
+            if cat_col not in out.columns:
+                out[cat_col] = default_val
+
+        return out
+
+    def fit(self, X: pd.DataFrame, y: Any = None) -> RawInputNormalizer:
+        norm = self._normalize_frame(X)
+        parsed = handle_missing_values(norm, bathroom_median=self.default_bathroom_median)
+        if "Bathroom" in norm.columns:
+            raw_bath = pd.to_numeric(
+                norm["Bathroom"].astype("string").replace({"> 10": "11", ">10": "11"}),
+                errors="coerce",
+            )
+            valid_bath = raw_bath[raw_bath > 0]
+            self.bathroom_median_ = (
+                float(valid_bath.median())
+                if valid_bath.notna().any()
+                else float(self.default_bathroom_median)
+            )
+        else:
+            valid_bath = parsed["bathroom_count"][parsed["bathroom_count"] > 0]
+            self.bathroom_median_ = (
+                float(valid_bath.median())
+                if valid_bath.notna().any()
+                else float(self.default_bathroom_median)
+            )
+        return self
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        norm = self._normalize_frame(X)
+        return handle_missing_values(norm, bathroom_median=self.bathroom_median_)
+
+
+class FeatureMatrixAligner(BaseEstimator, TransformerMixin):
+    """Select and order engineered numeric + one-hot columns consistently as a float DataFrame."""
+
+    def __init__(self, numeric_cols: Iterable[str] = NUMERIC_FEATURE_COLUMNS) -> None:
+        self.numeric_cols = tuple(numeric_cols)
+
+    def fit(self, X: pd.DataFrame, y: Any = None) -> FeatureMatrixAligner:
+        num_present = [c for c in self.numeric_cols if c in X.columns]
+        cat_prefixes = tuple(f"{col}_" for col in DEFAULT_CATEGORICAL_COLUMNS)
+        encoded_cols = [c for c in X.columns if str(c).startswith(cat_prefixes)]
+        self.feature_names_ = num_present + encoded_cols
+        return self
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        out = pd.DataFrame(index=X.index)
+        for col in self.feature_names_:
+            if col in X.columns:
+                out[col] = pd.to_numeric(X[col], errors="coerce").astype("float64")
+            else:
+                out[col] = 0.0
+        return out

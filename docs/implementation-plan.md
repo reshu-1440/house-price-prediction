@@ -18,7 +18,7 @@
 | 7 | Hyperparameter Optimization | `Completed` | Phase 6 | `src/models/hyperparameter_tuning.py`, `config/hyperparameters.yaml`, `reports/tuning_results.md` |
 | 8 | Model Evaluation | `Completed` | Phase 6, 7 | `src/models/evaluate.py`, `reports/model_evaluation.md`, `reports/figures/` |
 | 9 | MLflow & Model Management | `Completed` | Phase 6–8 | `src/models/mlflow_tracking.py`, `mlflow_experiments/` |
-| 10 | ML Pipeline Development | `Pending` | Phase 3–9 | `src/pipeline/training_pipeline.py`, `src/pipeline/inference_pipeline.py`, `models/` |
+| 10 | ML Pipeline Development | `Completed` | Phase 3–9 | `src/pipeline/training_pipeline.py`, `src/pipeline/inference_pipeline.py`, `models/` |
 | 11 | Backend Development | `Pending` | Phase 10 | `src/api/{app,schemas,dependencies,middleware}.py`, `docs/api-documentation.md` |
 | 12 | Testing | `Pending` | Phase 1–11 | `tests/{unit,integration,model}/`, `pytest.ini`, `Makefile` |
 | 13 | Docker & CI/CD | `Pending` | Phase 11, 12 | `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `.github/workflows/`, `scripts/` |
