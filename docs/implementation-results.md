@@ -120,3 +120,28 @@
     - Train-only `bathroom_count` median (`2.0`) and log10-IQR bounds applied to both splits.
     - Leakage validation: `index_disjoint = True`, `cross_split_duplicates = 0`, `leakage_column_absent = True`, KS statistic = `0.00409` (`p = 0.99499`).
     - Verified `geographical_split` cleanly isolates holdout cities (`pune`, `jaipur`) on the generated training split.
+- **Commit**: `9c7640c` (`Phase 5: Train/test splitting with stratification and leakage validation`)
+
+---
+
+## Phase 6 — Model Development
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `src/models/__init__.py`
+  - `src/models/train.py` (`train_baseline`, `train_linear_models`, `train_decision_tree`, `train_random_forest`, `train_gradient_boosting`, `get_candidate_models`, `compare_models`, `run_model_comparison`)
+  - `src/models/predict.py` (`predict`, `predict_single`)
+  - `tests/unit/test_models.py`
+  - `reports/model_comparison.md` and `reports/figures/model_comparison.png`
+  - Updated `requirements.txt` and `setup.py` with `xgboost>=2.1.0` and `lightgbm>=4.5.0`
+- **Verified Benchmark Results (`51,568` train / `12,892` test, `50` features)**:
+  - `XGBoost`: Test R² = `0.8020`, MAE = `2,294,631.54 INR`, RMSE = `4,964,175.07 INR`, MAPE = `22.81%`, Fit = `5.395s`
+  - `LightGBM`: Test R² = `0.8019`, MAE = `2,293,107.10 INR`, RMSE = `4,965,086.68 INR`, MAPE = `22.80%`, Fit = `4.732s`
+  - `RandomForest`: Test R² = `0.7970`, MAE = `2,287,191.84 INR`, RMSE = `5,026,132.55 INR`, MAPE = `22.87%`, Fit = `35.915s`
+  - `HistGradientBoosting`: Test R² = `0.7950`, MAE = `2,317,845.49 INR`, Fit = `10.893s`
+  - `DecisionTree`: Test R² = `0.7484`, Fit = `0.870s`
+  - `Ridge` / `LinearRegression` / `Lasso`: Test R² = `0.6386` / `0.6385` / `0.6382`
+  - `Baseline_Median`: Test R² = `-0.0894`, MAE = `5,740,420.42 INR`
+- **Verification**:
+  - `python -m pytest -v`: `28 passed`.
+  - `python -m src.models.train`: exited `0`, generated `reports/model_comparison.md` and `reports/figures/model_comparison.png`.

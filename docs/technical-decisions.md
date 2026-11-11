@@ -52,3 +52,10 @@
 - **Context**: Applying global medians (`bathroom_count`) or global quantile/log-IQR bounds before splitting leaks test distribution statistics into training.
 - **Decision**: Perform only deterministic row-level deduplication and parsing prior to `train_test_split_stratified`, then fit `bathroom_median` and log10-IQR `outlier_bounds` strictly on the training split and apply them to both splits.
 - **Consequences**: Zero train/test statistical leakage while maintaining identical schema and distribution parity (`KS p = 0.99499`).
+
+## TD-008: Wrap Regressors with `TransformedTargetRegressor(log1p / expm1)`
+- **Date**: 2026-11-12 (Phase 6)
+- **Status**: Accepted
+- **Context**: Target `Price_in_rupees` is strongly right-skewed (`3.5 Lac` to `12.9 Cr`), causing raw linear/MSE objectives to focus disproportionately on luxury outliers and occasionally predict negative prices for linear models.
+- **Decision**: Wrap regression algorithms with `sklearn.compose.TransformedTargetRegressor(func=np.log1p, inverse_func=np.expm1)` while preserving standard INR predictions via `.predict()`.
+- **Consequences**: Stabilizes variance across metro/non-metro price tiers, improves relative percentage accuracy (`MAPE`), and guarantees strictly positive predictions.
