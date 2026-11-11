@@ -20,6 +20,7 @@ htmlcov/
 
 # Generated data, models & tracking stores
 data/processed/
+Data/processed/
 models/*.joblib
 models/versions/
 mlruns/

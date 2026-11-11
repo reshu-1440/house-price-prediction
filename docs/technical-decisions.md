@@ -45,3 +45,10 @@
 - **Context**: Phase 2 EDA established that `Carpet Area` and `Super Area` are mutually exclusive (`Both = 0`) and that raw numeric values span corrupt extremes (`1,400.3 Cr` price, `1.27B sqft` area). Linear IQR would discard legitimate metro luxury apartments.
 - **Decision**: Coalesce area into `effective_area_sqft` alongside an explicit `area_type` indicator (`carpet` vs. `super`), and apply `log10` IQR (`factor = 2.5`) bounds on `Price_in_rupees` and `effective_area_sqft` (accepting pre-computed bounds from training splits).
 - **Consequences**: Preserves `99.11%` of valid deduplicated sale listings across all 81 cities while stripping corrupt extremes and retaining area measurement semantics.
+
+## TD-007: Split Before Fitting Imputers & Outlier Bounds
+- **Date**: 2026-11-12 (Phase 5)
+- **Status**: Accepted
+- **Context**: Applying global medians (`bathroom_count`) or global quantile/log-IQR bounds before splitting leaks test distribution statistics into training.
+- **Decision**: Perform only deterministic row-level deduplication and parsing prior to `train_test_split_stratified`, then fit `bathroom_median` and log10-IQR `outlier_bounds` strictly on the training split and apply them to both splits.
+- **Consequences**: Zero train/test statistical leakage while maintaining identical schema and distribution parity (`KS p = 0.99499`).

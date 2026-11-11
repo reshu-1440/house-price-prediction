@@ -102,3 +102,21 @@
 - **Verification**:
   - `python -m pytest -v`: `22 passed`.
   - Full cleaned dataset verification (`feature_pipeline` fit on 80% split, transformed on 20%): engineered `50` numeric/one-hot features across `51,568` train and `12,893` test samples with `0` NaNs and `All finite: True`.
+- **Commit**: `57c0638` (`Phase 4: Feature engineering with custom transformers and encoding`)
+
+---
+
+## Phase 5 — Data Splitting & Validation
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `src/data/split.py` (`create_price_bins`, `train_test_split_stratified`, `geographical_split`, `validate_no_leakage`, `save_splits`, `run_split_pipeline`)
+  - `tests/unit/test_split.py`
+  - Generated `data/processed/{train.csv,test.csv,split_metadata.json}` (gitignored CSV/runtime split outputs under `data/processed/` & `Data/processed/`)
+- **Verification**:
+  - `python -m pytest -v`: `27 passed`.
+  - `python -m src.data.split`:
+    - `train = 51,568` rows (`80.0%`), `test = 12,892` rows (`20.0%`).
+    - Train-only `bathroom_count` median (`2.0`) and log10-IQR bounds applied to both splits.
+    - Leakage validation: `index_disjoint = True`, `cross_split_duplicates = 0`, `leakage_column_absent = True`, KS statistic = `0.00409` (`p = 0.99499`).
+    - Verified `geographical_split` cleanly isolates holdout cities (`pune`, `jaipur`) on the generated training split.

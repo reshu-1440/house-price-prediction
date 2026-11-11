@@ -13,7 +13,7 @@
 | 2 | Data Understanding & EDA | `Completed` | Phase 1 | `src/data/eda.py`, `notebooks/01_eda.py`, `reports/` |
 | 3 | Data Cleaning & Validation | `Completed` | Phase 2 | `src/data/cleaning.py`, `src/data/validators.py`, `tests/unit/test_cleaning.py` |
 | 4 | Feature Engineering | `Completed` | Phase 3 | `src/features/transformers.py`, `src/features/build_features.py`, `tests/unit/test_features.py` |
-| 5 | Data Splitting & Validation | `Pending` | Phase 3, 4 | `src/data/split.py`, `data/processed/` |
+| 5 | Data Splitting & Validation | `Completed` | Phase 3, 4 | `src/data/split.py`, `data/processed/` |
 | 6 | Model Development | `Pending` | Phase 4, 5 | `src/models/train.py`, `src/models/predict.py`, `reports/model_comparison.md` |
 | 7 | Hyperparameter Optimization | `Pending` | Phase 6 | `src/models/hyperparameter_tuning.py`, `config/hyperparameters.yaml`, `reports/tuning_results.md` |
 | 8 | Model Evaluation | `Pending` | Phase 6, 7 | `src/models/evaluate.py`, `reports/model_evaluation.md`, `reports/figures/` |
