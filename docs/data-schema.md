@@ -34,21 +34,22 @@ Observed directly on `Data/house_prices.csv`: **187,531 rows × 21 columns**.
 
 ---
 
-## 2. Cleaned & Engineered Schemas `[Planned: Phases 3–5]`
+## 2. Cleaned Schema (`src/data/cleaning.py`) `[Implemented: Phase 3]`
 
-To be finalized and verified in Phases 3–5:
+Verified output of `clean_pipeline` on `Data/house_prices.csv`: **64,461 rows × 20 columns**.
+
 - **Target**:
   - `Price_in_rupees` (`float64`, strictly `> 0`): parsed from `Amount(in rupees)` (`Lac`/`Lakh` × `1e5`, `Cr`/`Crore` × `1e7`; `Call for Price` excluded).
-- **Cleaned Base Columns**:
-  - Dropped: `Index`, `Dimensions`, `Plot Area`, `Price (in rupees)` (leakage), `Amount(in rupees)` (raw target text after parsing).
-  - Parsed Numeric: `carpet_area_sqft`, `super_area_sqft`, `effective_area_sqft` (resolved from Carpet/Super), `bathroom_count`, `balcony_count`, `parking_count`, `parking_type`.
-  - Filtered Transactions: `Resale`, `New Property` (excluding `Rent/Lease`, `Other`, missing).
-  - Deduplication: exact duplicates removed after excluding `Index`.
-- **Engineered Features (Phase 4)**:
-  - `bhk` (`int/float` parsed from `Title`)
-  - `floor_number`, `total_floors`, `floor_ratio` (parsed from `Floor`, handling `Ground` = 0)
-  - `area_per_bhk`, `bathroom_per_bhk`, `log_effective_area`
-  - Fit-only / out-of-fold encoded `location` statistics & encoded categorical columns (`Transaction`, `Furnishing`, `Ownership`, `Status`, `facing`).
+- **Dropped Columns**: `Index`, `Dimensions`, `Plot Area`, `Price (in rupees)` (leakage), `Amount(in rupees)`, `Carpet Area`, `Super Area`, `Bathroom`, `Balcony`, `Car Parking` (replaced by parsed fields).
+- **Cleaned & Parsed Columns**:
+  - Numeric: `carpet_area_sqft`, `super_area_sqft`, `effective_area_sqft` (`carpet` coalesced with `super`), `bathroom_count` (`> 10` -> `11.0`, median-imputed `2.0`), `balcony_count` (`> 10` -> `11.0`, `0.0` when missing), `parking_count` (`0.0` when missing).
+  - Categorical / Text: `Title`, `Description`, `location` (normalized lowercase), `Transaction` (`Resale`, `New Property`), `Status`, `Floor`, `Furnishing`, `facing`, `overlooking`, `Society`, `Ownership`, `area_type` (`carpet`, `super`), `parking_type` (`Covered`, `Open`, `Other`, `Missing`).
+
+### Planned Feature Engineering Columns `[Planned: Phases 4–5]`
+- `bhk` (`float` parsed from `Title`)
+- `floor_number`, `total_floors`, `floor_ratio` (parsed from `Floor`, handling `Ground` = 0)
+- `area_per_bhk`, `bathroom_per_bhk`, `log_effective_area`
+- Fit-only / out-of-fold encoded `location` statistics & encoded categorical columns (`Transaction`, `Furnishing`, `Ownership`, `Status`, `facing`, `area_type`, `parking_type`).
 
 ---
 

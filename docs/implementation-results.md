@@ -69,3 +69,20 @@
 - **Verification**:
   - `python -m pytest -v`: `9 passed`.
   - `python notebooks/01_eda.py`: completed exit code `0`, generated JSON, Markdown, and 6 PNG figures.
+- **Commit**: `58edd69` (`Phase 2: Exploratory data analysis with visualizations and data quality report`)
+
+---
+
+## Phase 3 — Data Cleaning & Validation
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `src/data/cleaning.py` (canonical price/area/count/parking parsers, `Index`-excluded deduplication, valid record filtering, missing-value handling, log10-IQR outlier filtering)
+  - `src/data/validators.py` (`validate_raw_schema`, `validate_cleaned_data`, `assert_valid`, `SchemaValidationError`)
+  - Refactored `src/data/eda.py` to reuse shared parsers from `src/data/cleaning.py`
+  - `tests/unit/test_cleaning.py`
+- **Verification**:
+  - `python -m pytest -v`: `16 passed`.
+  - Full dataset run (`clean_pipeline` + `validate_cleaned_data` on `Data/house_prices.csv`):
+    - `187,531` raw -> `68,192` after `Index`-excluded dedup -> `65,048` valid sale listings with positive price & area -> `64,461` final rows × `20` columns after `2.5 * IQR` log10 outlier filter (`Price_in_rupees` bounds: `355,776.5`–`125,612,569.9` INR; `effective_area_sqft` bounds: `197.2`–`6,759.5` sqft).
+    - All `10` schema/domain validation checks passed (`Price (in rupees)` absent, zero nulls in critical columns, zero duplicate rows).

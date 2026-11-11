@@ -38,3 +38,10 @@
 - **Context**: Exploratory script `Data/data_cleaning.py` filtered to 3 cities (`new-delhi`, `bangalore`, `ahmedabad`). The full dataset covers `81` Indian cities.
 - **Decision**: Support all 81 cities in the modular `src/` pipeline via configuration (defaulting to full-dataset training with optional city filtering in `config/config.yaml`) and handle high-cardinality cities with smoothed/out-of-fold target + frequency encoding.
 - **Consequences**: Generalizes across all cities present in the dataset while preserving configurable city-subset experimentation and geographic holdout validation.
+
+## TD-006: Unify Area Columns and Apply Log10-IQR (`2.5`) Outlier Bounds
+- **Date**: 2026-11-12 (Phase 3)
+- **Status**: Accepted
+- **Context**: Phase 2 EDA established that `Carpet Area` and `Super Area` are mutually exclusive (`Both = 0`) and that raw numeric values span corrupt extremes (`1,400.3 Cr` price, `1.27B sqft` area). Linear IQR would discard legitimate metro luxury apartments.
+- **Decision**: Coalesce area into `effective_area_sqft` alongside an explicit `area_type` indicator (`carpet` vs. `super`), and apply `log10` IQR (`factor = 2.5`) bounds on `Price_in_rupees` and `effective_area_sqft` (accepting pre-computed bounds from training splits).
+- **Consequences**: Preserves `99.11%` of valid deduplicated sale listings across all 81 cities while stripping corrupt extremes and retaining area measurement semantics.

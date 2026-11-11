@@ -16,65 +16,14 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+from src.data.cleaning import (
+    parse_area_series as _extract_area_sqft,
+    parse_count_series as _extract_count_with_gt10,
+    parse_price_series as _extract_numeric_price,
+)
 from src.utils.config import get_logger
 
 logger = get_logger(__name__)
-
-_PRICE_UNIT_MULTIPLIERS: dict[str, float] = {
-    "cr": 1e7,
-    "crore": 1e7,
-    "lac": 1e5,
-    "lakh": 1e5,
-}
-
-_AREA_TO_SQFT: dict[str, float] = {
-    "sqft": 1.0,
-    "sqyrd": 9.0,
-    "sqm": 10.7639,
-    "acre": 43560.0,
-    "marla": 272.25,
-    "kanal": 5445.0,
-    "ground": 2400.0,
-    "cent": 435.56,
-    "bigha": 27000.0,
-    "biswa2": 1350.0,
-    "aankadam": 72.0,
-}
-
-
-def _extract_numeric_price(series: pd.Series) -> pd.Series:
-    """Parse ``Amount(in rupees)`` strings into numeric INR, returning NaN for Call for Price."""
-    text = series.astype("string").str.strip()
-    is_call = text.str.contains("Call for Price", case=False, na=False)
-    nums = pd.to_numeric(
-        text.str.replace(",", "", regex=False).str.extract(r"([-+]?\d*\.?\d+)")[0],
-        errors="coerce",
-    )
-    units = (
-        text.str.extract(r"\b(cr|crore|lac|lakh)\b", flags=re.IGNORECASE)[0]
-        .str.lower()
-        .fillna("")
-    )
-    multipliers = units.map(_PRICE_UNIT_MULTIPLIERS).fillna(1.0)
-    parsed = (nums * multipliers).astype("float64")
-    parsed.loc[is_call] = np.nan
-    return parsed
-
-
-def _extract_area_sqft(series: pd.Series) -> pd.Series:
-    """Parse area strings (with commas and regional units) into square feet."""
-    text = series.astype("string").str.strip().str.replace(",", "", regex=False)
-    nums = pd.to_numeric(text.str.extract(r"([-+]?\d*\.?\d+)")[0], errors="coerce")
-    units = text.str.extract(r"[0-9.]+\s*([A-Za-z0-9]+)$")[0].str.lower().fillna("sqft")
-    factors = units.map(_AREA_TO_SQFT).fillna(np.nan)
-    return (nums * factors).astype("float64")
-
-
-def _extract_count_with_gt10(series: pd.Series) -> pd.Series:
-    """Parse count strings where ``> 10`` maps to 11.0 for numeric profiling."""
-    text = series.astype("string").str.strip()
-    mapped = text.replace({"> 10": "11", ">10": "11"})
-    return pd.to_numeric(mapped, errors="coerce").astype("float64")
 
 
 def _prepare_eda_frame(df: pd.DataFrame) -> pd.DataFrame:
