@@ -14,6 +14,24 @@
 
 ## 2. Environment Setup on a Fresh Clone
 
+### Windows One-Step Batch Scripts (`setup.bat` & `start.bat`)
+
+Run `setup.bat` from the repository root (double-click or run in terminal) to execute the full setup and training workflow automatically:
+- Creates `.venv` (if missing) and installs `requirements.txt` + editable package `-e .`
+- Downloads `Data/house_prices.csv` via `Data/data_download.py` (skips if already present) and verifies schema via `src.data.load_data`
+- Runs EDA (`notebooks/01_eda.py`), cleaning & stratified splitting (`src.data.split`), model comparison (`src.models.train`), hyperparameter tuning (`src.models.hyperparameter_tuning`), evaluation (`src.models.evaluate`), MLflow tracking/registration (`src.models.mlflow_tracking`), and production pipeline serialization (`src.pipeline.training_pipeline`)
+- Verifies lint (`ruff`) and tests (`pytest`)
+
+Optional flags: `setup.bat --skip-tune`, `setup.bat --skip-install`, `setup.bat --skip-tests`, `setup.bat --no-pause`, `setup.bat --help`.
+
+Once setup finishes, launch the project with `start.bat`:
+- `start.bat` — Starts FastAPI inference server at `http://127.0.0.1:8000` (`--open` opens `/docs`, `--reload` enables auto-reload, `--prod` uses `config/production.yaml`)
+- `start.bat --mlflow` — Starts MLflow Tracking UI at `http://127.0.0.1:5000`
+- `start.bat --dashboard` — Opens `reports/monitoring/monitoring_dashboard.html`
+- `start.bat --docker` — Runs `docker compose up -d --build`
+
+### Manual PowerShell Setup
+
 Activate the virtual environment in Windows PowerShell:
 
 ```powershell

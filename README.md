@@ -29,6 +29,29 @@ An end-to-end machine learning engineering workflow to predict residential prope
 
 ## 3. Quickstart for Teammates (Clone & Run)
 
+### Windows Batch Scripts (`setup.bat` & `start.bat`)
+
+On Windows, you can run the full setup/training pipeline and launch the server with two root batch scripts:
+
+```bat
+:: 1. Create .venv, install dependencies, download dataset, run EDA, split,
+::    benchmark models, tune hyperparameters, evaluate, log to MLflow,
+::    serialize models\house_price_pipeline.joblib, and run ruff + pytest:
+setup.bat
+
+:: Optional faster re-run skipping Optuna/RandomizedSearchCV tuning:
+setup.bat --skip-tune
+
+:: 2. Start the FastAPI inference server (http://127.0.0.1:8000/docs):
+start.bat
+
+:: Optional modes for start.bat:
+start.bat --open        :: Start FastAPI and open Swagger UI in your browser
+start.bat --mlflow      :: Launch MLflow Tracking UI (http://127.0.0.1:5000)
+start.bat --dashboard   :: Open reports\monitoring\monitoring_dashboard.html
+start.bat --docker      :: Build and start API + MLflow via Docker Compose
+```
+
 ### Option A — Run Tests, Lint & Container Build (No Dataset Required)
 
 All `pytest` tests and `ruff` checks use self-contained synthetic fixtures and run immediately after cloning:
