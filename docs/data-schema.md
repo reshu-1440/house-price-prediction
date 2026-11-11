@@ -45,11 +45,13 @@ Verified output of `clean_pipeline` on `Data/house_prices.csv`: **64,461 rows ×
   - Numeric: `carpet_area_sqft`, `super_area_sqft`, `effective_area_sqft` (`carpet` coalesced with `super`), `bathroom_count` (`> 10` -> `11.0`, median-imputed `2.0`), `balcony_count` (`> 10` -> `11.0`, `0.0` when missing), `parking_count` (`0.0` when missing).
   - Categorical / Text: `Title`, `Description`, `location` (normalized lowercase), `Transaction` (`Resale`, `New Property`), `Status`, `Floor`, `Furnishing`, `facing`, `overlooking`, `Society`, `Ownership`, `area_type` (`carpet`, `super`), `parking_type` (`Covered`, `Open`, `Other`, `Missing`).
 
-### Planned Feature Engineering Columns `[Planned: Phases 4–5]`
-- `bhk` (`float` parsed from `Title`)
-- `floor_number`, `total_floors`, `floor_ratio` (parsed from `Floor`, handling `Ground` = 0)
-- `area_per_bhk`, `bathroom_per_bhk`, `log_effective_area`
-- Fit-only / out-of-fold encoded `location` statistics & encoded categorical columns (`Transaction`, `Furnishing`, `Ownership`, `Status`, `facing`, `area_type`, `parking_type`).
+### Engineered Feature Matrix (`src/features/build_features.py`) `[Implemented: Phase 4]`
+
+Verified **50 engineered features** (zero NaNs, all finite):
+- **Extracted Structural Features**: `bhk`, `is_studio`, `is_penthouse`, `floor_number`, `total_floors`, `floor_ratio`, `is_ground_floor`, `is_top_floor`.
+- **Area & Interaction Features**: `effective_area_sqft`, `log_effective_area`, `area_per_bhk`, `bathroom_per_bhk`, `total_rooms_proxy`, `bhk_x_log_area`, `is_carpet_area`, `has_society`, `has_overlooking`.
+- **Location Encodings (`LocationEncoder`, out-of-fold during train `fit_transform`)**: `location_target_enc`, `location_log_target_enc`, `location_freq`.
+- **One-Hot Categorical Encodings (`CategoricalEncoder`, `handle_unknown="ignore"`)**: encoded columns from `Transaction`, `Status`, `Furnishing`, `Ownership`, normalized `facing`, `area_type`, `parking_type`.
 
 ---
 

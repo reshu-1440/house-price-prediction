@@ -18,6 +18,7 @@
 - `setuptools==84.2.1`, `wheel==0.48.0` — Packaging & editable installs
 - `pytest==9.2.0` — Test runner
 - `matplotlib==3.11.2`, `seaborn==0.13.2`, `scipy==1.18.1` — EDA, statistical tests & visualization
+- `scikit-learn==1.9.1`, `joblib==1.6.0` — Transformers, pipelines, regression models & serialization
 
 ## 3. Planned Stack by Phase `[Planned]`
 - **EDA & Visualization (Phase 2, 8)**: `matplotlib`, `seaborn`, `scipy`

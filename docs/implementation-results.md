@@ -86,3 +86,19 @@
   - Full dataset run (`clean_pipeline` + `validate_cleaned_data` on `Data/house_prices.csv`):
     - `187,531` raw -> `68,192` after `Index`-excluded dedup -> `65,048` valid sale listings with positive price & area -> `64,461` final rows × `20` columns after `2.5 * IQR` log10 outlier filter (`Price_in_rupees` bounds: `355,776.5`–`125,612,569.9` INR; `effective_area_sqft` bounds: `197.2`–`6,759.5` sqft).
     - All `10` schema/domain validation checks passed (`Price (in rupees)` absent, zero nulls in critical columns, zero duplicate rows).
+- **Commit**: `8975b52` (`Phase 3: Data cleaning pipeline with validation and schema checks`)
+
+---
+
+## Phase 4 — Feature Engineering
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `src/features/__init__.py`
+  - `src/features/transformers.py` (`BHKExtractor`, `FloorExtractor`, `AreaFeatureBuilder`, `LocationEncoder`, `CategoricalEncoder`)
+  - `src/features/build_features.py` (`extract_bhk`, `extract_floor_info`, `create_area_features`, `create_interaction_features`, `feature_pipeline`)
+  - `tests/unit/test_features.py`
+  - Updated `requirements.txt` and `setup.py` with `scikit-learn>=1.6.0` and `joblib>=1.4.0`
+- **Verification**:
+  - `python -m pytest -v`: `22 passed`.
+  - Full cleaned dataset verification (`feature_pipeline` fit on 80% split, transformed on 20%): engineered `50` numeric/one-hot features across `51,568` train and `12,893` test samples with `0` NaNs and `All finite: True`.

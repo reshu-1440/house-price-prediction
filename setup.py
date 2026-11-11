@@ -16,5 +16,7 @@ setup(
         "matplotlib>=3.9.0",
         "seaborn>=0.13.0",
         "scipy>=1.14.0",
+        "scikit-learn>=1.6.0",
+        "joblib>=1.4.0",
     ],
 )
