@@ -1,0 +1,11 @@
+# Agent & Engineering Decision Log
+
+> Append-only chronological register synchronized with [`docs/technical-decisions.md`](../docs/technical-decisions.md).
+
+| ID | Date | Phase | Decision | Canonical Detail |
+|----|------|-------|----------|------------------|
+| TD-001 | 2026-11-12 | Phase 0 | Keep raw CSV at `Data/house_prices.csv` to avoid duplicating a 106 MB git blob | [docs/technical-decisions.md#td-001](../docs/technical-decisions.md#td-001-keep-raw-dataset-at-datahouse_pricescsv) |
+| TD-002 | 2026-11-12 | Phase 0 | Document file/MLflow/log schemas in `docs/data-schema.md` & `agents/data-guidelines.md` rather than inventing an unused SQL DB schema | [docs/technical-decisions.md#td-002](../docs/technical-decisions.md#td-002-use-file--mlflow-persistence-instead-of-an-rdbms) |
+| TD-003 | 2026-11-12 | Phase 0 | Ban `Price (in rupees)` from features to prevent target leakage | [docs/technical-decisions.md#td-003](../docs/technical-decisions.md#td-003-exclude-price-in-rupees-from-input-features-leakage-prevention) |
+| TD-004 | 2026-11-12 | Phase 0 | Deduplicate excluding `Index` (`119,339` masked duplicates) before train/test split | [docs/technical-decisions.md#td-004](../docs/technical-decisions.md#td-004-deduplicate-excluding-index-before-splitting) |
+| TD-005 | 2026-11-12 | Phase 0 | Support all 81 cities via config instead of hardcoding 3 prototype cities | [docs/technical-decisions.md#td-005](../docs/technical-decisions.md#td-005-expand-geographic-scope-beyond-3-prototype-cities) |
