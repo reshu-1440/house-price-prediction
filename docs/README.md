@@ -18,7 +18,7 @@ Welcome to the central knowledge base for the **House Price Prediction** end-to-
 | [api-documentation.md](api-documentation.md) | FastAPI REST contract, request/response schemas, status codes, and integration notes | Planned (Phase 11) |
 | [setup-guide.md](setup-guide.md) | Local development environment setup (`.venv`, Python 3.13.15, git, dataset verification) | Living |
 | [known-issues.md](known-issues.md) | Confirmed dataset quirks, legacy prototype script limitations, and pending improvements | Living |
-| `deployment_guide.md` | AWS infrastructure & production deployment instructions | Planned (Phase 14) |
+| [deployment_guide.md](deployment_guide.md) | AWS infrastructure & production deployment instructions | Implemented (Phase 14) |
 | `retraining_guide.md` | Automated retraining triggers, champion/challenger approval, and rollback instructions | Planned (Phase 16) |
 
 ---

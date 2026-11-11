@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
+from typing import Any
 
+import uvicorn
 from fastapi import Depends, FastAPI
 
 from src.api.dependencies import ModelRegistryState, get_model_state, model_state
@@ -19,6 +23,20 @@ from src.api.schemas import (
     format_inr_price,
 )
 from src.pipeline.inference_pipeline import predict_from_raw
+from src.utils.config import load_config, resolve_path
+
+
+def load_production_settings(config_path: str | Path | None = None) -> dict[str, Any]:
+    """Load production API settings from ``config/production.yaml`` with env overrides."""
+    target = Path(config_path) if config_path is not None else resolve_path("config/production.yaml")
+    settings: dict[str, Any] = load_config(target) if target.exists() else {}
+
+    env_origins = os.getenv("ALLOWED_ORIGINS")
+    if env_origins:
+        settings.setdefault("cors", {})["allowed_origins"] = [
+            o.strip() for o in env_origins.split(",") if o.strip()
+        ]
+    return settings
 
 
 @asynccontextmanager
@@ -101,4 +119,29 @@ def create_app(allowed_origins: list[str] | None = None) -> FastAPI:
     return application
 
 
-app = create_app()
+def _default_allowed_origins() -> list[str] | None:
+    if os.getenv("APP_ENV", "").strip().lower() == "production":
+        settings = load_production_settings()
+        return settings.get("cors", {}).get("allowed_origins")
+    return None
+
+
+def run_production_server(config_path: str | Path | None = None) -> None:
+    """Start uvicorn using production server settings from ``config/production.yaml``."""
+    settings = load_production_settings(config_path)
+    srv = settings.get("server", {})
+    uvicorn.run(
+        "src.api.app:app",
+        host=str(srv.get("host", "0.0.0.0")),
+        port=int(srv.get("port", 8000)),
+        workers=int(srv.get("workers", 2)),
+        log_level=str(srv.get("log_level", "info")),
+        timeout_keep_alive=int(srv.get("timeout_keep_alive", 30)),
+    )
+
+
+app = create_app(allowed_origins=_default_allowed_origins())
+
+
+if __name__ == "__main__":
+    run_production_server()

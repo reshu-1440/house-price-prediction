@@ -267,3 +267,20 @@
   - `docker compose config -q`: exited `0` (valid compose syntax and schema).
   - YAML & Dockerfile structural validation: `docker-compose.yml`, `.github/workflows/ci.yml`, `.github/workflows/cd.yml`, and `Dockerfile` multi-stage/non-root directives passed.
   - Note: Docker Desktop daemon (`desktop-linux`) was not running on the host (`docker info` exited `1`), so live `docker build` / container startup was not executed locally.
+- **Commit**: `f6991ac` (`Phase 13: Docker containerization and GitHub Actions CI/CD pipelines`)
+
+---
+
+## Phase 14 — Cloud Deployment
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `infrastructure/cloudformation.yaml` (13 AWS resources: S3 bucket, ECR repo, CloudWatch logs, IAM roles, ALB, TargetGroup `/health`, SecurityGroups, ECS Fargate cluster/task/service)
+  - `config/production.yaml` & `scripts/aws_deploy.sh`
+  - `src/api/app.py` (added `load_production_settings`, `APP_ENV=production` CORS binding, and `run_production_server`)
+  - `docs/deployment_guide.md`, updated `docs/README.md`
+  - Updated `tests/unit/test_schemas.py` with `test_load_production_settings`
+- **Verification**:
+  - CloudFormation YAML structure check: `13` resources and `4` outputs validated.
+  - `python -m ruff check src tests`: `All checks passed!`.
+  - `python -m pytest -v`: `42 passed` (verified after final edits).

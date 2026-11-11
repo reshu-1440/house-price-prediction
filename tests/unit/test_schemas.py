@@ -5,11 +5,21 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
+from src.api.app import create_app, load_production_settings
 from src.api.schemas import (
     BatchPredictionRequest,
     HousePredictionRequest,
     format_inr_price,
 )
+
+
+def test_load_production_settings() -> None:
+    settings = load_production_settings()
+    assert settings["environment"] == "production"
+    assert settings["server"]["port"] == 8000
+    assert settings["server"]["workers"] >= 1
+    prod_app = create_app(allowed_origins=settings["cors"]["allowed_origins"])
+    assert prod_app.title == "House Price Prediction API"
 
 
 def test_house_prediction_request_validation_and_formatting() -> None:
