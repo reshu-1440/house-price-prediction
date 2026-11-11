@@ -68,8 +68,7 @@ def parse_price_series(series: pd.Series) -> pd.Series:
     )
     multipliers = units.map(PRICE_UNIT_MULTIPLIERS).fillna(1.0)
     parsed = (nums * multipliers).astype("float64")
-    parsed.loc[is_call | (parsed <= 0)] = np.nan
-    return parsed
+    return parsed.where(~is_call & (parsed > 0), np.nan)
 
 
 def parse_area_series(series: pd.Series) -> pd.Series:
@@ -79,8 +78,7 @@ def parse_area_series(series: pd.Series) -> pd.Series:
     units = text.str.extract(r"[0-9.]+\s*([A-Za-z0-9]+)$")[0].str.lower().fillna("sqft")
     factors = units.map(AREA_TO_SQFT).fillna(np.nan)
     parsed = (nums * factors).astype("float64")
-    parsed.loc[parsed <= 0] = np.nan
-    return parsed
+    return parsed.where(parsed > 0, np.nan)
 
 
 def parse_count_series(series: pd.Series) -> pd.Series:
@@ -207,7 +205,7 @@ def handle_missing_values(
         out["balcony_count"] = 0.0
 
     # Replace non-positive bathroom values with NaN before median imputation
-    out.loc[out["bathroom_count"] <= 0, "bathroom_count"] = np.nan
+    out["bathroom_count"] = out["bathroom_count"].where(out["bathroom_count"] > 0, np.nan)
     computed_median = (
         float(bathroom_median)
         if bathroom_median is not None

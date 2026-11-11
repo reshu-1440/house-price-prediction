@@ -17,6 +17,9 @@ xgboost>=2.1.0
 lightgbm>=4.5.0
 optuna>=4.0.0
 
+# Experiment tracking & model registry (Phase 9 verified)
+mlflow>=3.0.0
+
 # Packaging & testing
 setuptools>=75.0.0
 wheel>=0.45.0

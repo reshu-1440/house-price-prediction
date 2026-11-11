@@ -20,6 +20,7 @@
 - `matplotlib==3.11.2`, `seaborn==0.13.2`, `scipy==1.18.1` — EDA, statistical tests & visualization
 - `scikit-learn==1.9.1`, `joblib==1.6.0` — Transformers, pipelines, regression models & serialization
 - `xgboost==3.4.1`, `lightgbm==4.7.0`, `optuna==5.0.0` — Gradient boosting models & HPO
+- `mlflow==3.18.0` — Experiment tracking, SQLite backend & Model Registry
 
 ## 3. Planned Stack by Phase `[Planned]`
 - **EDA & Visualization (Phase 2, 8)**: `matplotlib`, `seaborn`, `scipy`

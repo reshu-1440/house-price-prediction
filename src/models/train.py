@@ -345,7 +345,10 @@ def get_candidate_models(
     return candidates
 
 
-def run_model_comparison(config_path: str | Path | None = None) -> pd.DataFrame:
+def run_model_comparison(
+    config_path: str | Path | None = None,
+    track_mlflow: bool = False,
+) -> pd.DataFrame:
     """Load processed splits, engineer features on train only, and compare regression models."""
     config = load_config(config_path)
     processed_dir = resolve_path(config["data"]["processed_dir"])
@@ -364,7 +367,7 @@ def run_model_comparison(config_path: str | Path | None = None) -> pd.DataFrame:
 
     candidates = get_candidate_models(random_state=seed, use_log_target=True)
 
-    results_df, _ = compare_models(
+    results_df, fitted_models = compare_models(
         candidates,
         X_train=X_train,
         y_train=y_train,
@@ -373,6 +376,27 @@ def run_model_comparison(config_path: str | Path | None = None) -> pd.DataFrame:
         output_md_path=reports_dir / "model_comparison.md",
         output_fig_path=figures_dir / "model_comparison.png",
     )
+
+    if track_mlflow:
+        from src.models.mlflow_tracking import log_experiment, setup_mlflow
+
+        setup_mlflow(config_path=config_path)
+        for _, row in results_df.iterrows():
+            m_name = str(row["model"])
+            log_experiment(
+                model=fitted_models[m_name],
+                metrics={
+                    "train_r2": float(row["train_r2"]),
+                    "test_r2": float(row["test_r2"]),
+                    "test_mae": float(row["test_mae"]),
+                    "test_rmse": float(row["test_rmse"]),
+                    "test_mape": float(row["test_mape"]),
+                },
+                params={"algorithm": m_name, "random_state": seed},
+                run_name=f"benchmark_{m_name}",
+                input_example=X_test.head(3),
+                tags={"phase": "6_benchmark"},
+            )
     return results_df
 
 

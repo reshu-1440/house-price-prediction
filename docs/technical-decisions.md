@@ -66,3 +66,10 @@
 - **Context**: Three-fold CV hyperparameter optimization across `XGBoost` (Optuna), `LightGBM` (Optuna), and `RandomForest` (RandomizedSearchCV) produced `lightgbm` as highest in both CV R² (`0.8082`) and held-out test R² (`0.8128`), with lowest test MAE (`2,206,793.51 INR`), lowest RMSE (`4,827,094.43 INR`), and smallest train-test gap (`0.1190`).
 - **Decision**: Persist tuned parameters in `config/hyperparameters.yaml` with `best_model: lightgbm` for Phase 8 evaluation and Phase 10 pipeline serialization.
 - **Consequences**: Provides fast training/inference latency with top generalization across all 81 cities, while retaining tuned `xgboost` and `random_forest` configs as fallback/challenger options.
+
+## TD-010: Use MLflow 3.18 SQLite Store, Alias Promotion, and `cloudpickle` Serialization
+- **Date**: 2026-11-12 (Phase 9)
+- **Status**: Accepted
+- **Context**: MLflow `3.18.0` defaults `mlflow.sklearn.log_model` to `skops` serialization, which rejects third-party estimator classes (`LGBMRegressor`, `XGBRegressor`, `collections.OrderedDict`) without exhaustive allowlists, and uses model aliases (`@production`) instead of legacy stages.
+- **Decision**: Use local SQLite tracking URI (`sqlite:///mlflow_experiments/mlflow.db`), `serialization_format=cloudpickle` for trusted local model artifacts, and MLflow 3.x registered model aliases (`@production` / `@staging`) in `src/models/mlflow_tracking.py`.
+- **Consequences**: Clean, reproducible model registry lifecycle supporting custom sklearn/boosting wrappers and zero-skew prediction reloads.

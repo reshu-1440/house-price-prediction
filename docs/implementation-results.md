@@ -184,3 +184,21 @@
 - **Verification**:
   - `python -m pytest -v`: `31 passed`.
   - `python -m src.models.evaluate`: exited `0`, generated Markdown, JSON, and 3 diagnostic PNG charts.
+- **Commit**: `b78be7d` (`Phase 8: Model evaluation with metrics, residual analysis, and error segmentation`)
+
+---
+
+## Phase 9 — MLflow & Model Management
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `src/models/mlflow_tracking.py` (`setup_mlflow`, `log_experiment`, `register_model`, `transition_model_stage`, `load_production_model`, `run_tracked_training`)
+  - `src/models/train.py` (added optional `track_mlflow=True` integration)
+  - `src/data/cleaning.py` (hardened pandas 3.1 + PyArrow CoW compatibility via `.where(...)`)
+  - `tests/unit/test_mlflow_tracking.py`
+  - Updated `requirements.txt` and `setup.py` with `mlflow>=3.0.0`
+- **Verification**:
+  - `python -m pytest -v`: `32 passed`.
+  - `python -m src.models.mlflow_tracking`:
+    - Logged `xgboost` (`eb91eef55fa34382bef1fd94bcefef91`) and `lightgbm` (`7e76ad5be3084641bfdfc8fe8f7ae492`) runs with model signatures and evaluation artifacts to `mlflow_experiments/mlflow.db`.
+    - Registered `house_price_regressor` version `1`, promoted alias `@production`, and verified `load_production_model` predictions matched original predictions (`registry_verified: true`).
