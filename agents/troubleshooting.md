@@ -6,6 +6,7 @@
 
 ## 2. Dataset & CSV Issues
 - **`DtypeWarning` / mixed column types on `Data/house_prices.csv`**: Pass `low_memory=False` to `pd.read_csv(...)`.
+- **`FileNotFoundError: Data/house_prices.csv`**: `Data/house_prices.csv` is gitignored (exceeds GitHub's 100 MB limit). Run `.\.venv\Scripts\python.exe Data/data_download.py` to download it from Kaggle into `Data/house_prices.csv`.
 - **`FileNotFoundError: house_prices.csv`**: Legacy scripts (`Data/data_check.py`, `Data/data_cleaning.py`) assumed working directory `Data/`. Phase 1+ modules resolve `Data/house_prices.csv` relative to repo root via `config/config.yaml`.
 - **`> 10` in `Bathroom` / `Balcony`**: Handle `'> 10'` explicitly before numeric casting (`str.replace('>', '', regex=False)` or mapping `'> 10'` -> `11`).
 - **Comma-formatted areas (`1,000 sqft`)**: Strip commas before numeric regex extraction.

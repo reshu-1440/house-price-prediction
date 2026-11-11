@@ -68,7 +68,10 @@ def load_raw_data(
 
     csv_path = resolve_path(raw_rel)
     if not csv_path.exists():
-        raise FileNotFoundError(f"Raw dataset file not found: {csv_path}")
+        raise FileNotFoundError(
+            f"Raw dataset file not found: {csv_path}. "
+            "Run 'python Data/data_download.py' to download it from Kaggle."
+        )
 
     logger.info("Loading raw dataset from %s", csv_path)
     df = pd.read_csv(csv_path, low_memory=False)

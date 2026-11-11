@@ -1,16 +1,17 @@
 # Implementation Results & Progress Log
 
-> This document records **only verified, executed outcomes** from completed phases. Nothing is marked complete until its verification gate has actually passed.
+> This document records **only verified, executed outcomes** from completed phases. Nothing is marked complete until its verification gate has actually passed. *(Note: Original commit SHAs listed below reflect pre-rewrite history prior to stripping `Data/house_prices.csv` per `TD-012`.)*
 
 ---
 
 ## Initial Baseline (Pre-Phase 0)
 
-- **Commit**: `b08cdf7` (`Initialize & Add Dataset`)
-- **Committed Files**:
-  - `.gitignore` (ignores `.venv`)
-  - `Data/data_download.py` (downloads Kaggle `juhibhojani/house-price`)
-  - `Data/house_prices.csv` (187,531 rows × 21 columns, 106,149,815 bytes)
+- **Initial Commit**: `Initialize & Add Dataset` *(later rewritten to exclude `Data/house_prices.csv` per `TD-012`)*
+- **Tracked Files**:
+  - `.gitignore` (ignores `.venv`, `Data/house_prices.csv`, etc.)
+  - `Data/data_download.py` (downloads Kaggle `juhibhojani/house-price` and stages `Data/house_prices.csv`)
+- **Local Raw Dataset (Gitignored)**:
+  - `Data/house_prices.csv` (187,531 rows × 21 columns, 106,149,815 bytes / 101.05 MiB)
 - **Untracked Exploratory Prototypes**:
   - `Data/data_check.py`
   - `Data/data_cleaning.py`
@@ -317,3 +318,21 @@
   - `python -m src.retraining.scheduler --dry-run`: returned `status: dry_run`, `cron_schedule: 0 2 * * 0`, `should_retrain: false`.
   - `python -m src.retraining.scheduler --force`: trained candidate end-to-end, passed champion/challenger gate (`R² = 0.8128`, `MAE = ₹2,206,793.51`, `r2_delta = 0.0`), archived `models/versions/v0.1.0/`, and atomically swapped `models/house_price_pipeline.joblib` (`status: promoted`).
   - `python -m pytest --cov=src --cov-report=term-missing -v`: **`47 passed`** (`83%` statement coverage across `2,254` statements in `src/`).
+
+---
+
+## Post-Phase 16 — GitHub Push Fix & Automated Dataset Onboarding (`TD-012`)
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - Rewrote commit history to remove `Data/house_prices.csv` (`101.05 MiB` blob exceeding GitHub's `100 MB` limit) from all commits while preserving the exact local file (`SHA256: ED1E6A1A2D1158F458CEF164F7E977F2C32A1EE392AD218037C11851814EF1E3`)
+  - `.gitignore`: added `Data/house_prices.csv` and `data/raw/`
+  - `Data/data_download.py`: upgraded to automatically locate and stage `house_prices.csv` at `Data/house_prices.csv` via `kagglehub`, with `--force` and `--output` CLI options
+  - `src/data/load_data.py`: added actionable `Data/data_download.py` hint when `Data/house_prices.csv` is missing
+  - `Makefile`: added `download-data` target
+  - `tests/unit/test_load_data.py`: added 2 unit tests covering missing-CSV download hint and `Data/data_download.py` staging/skip/`--force` behavior
+  - Updated `README.md`, `docs/setup-guide.md`, `docs/technical-decisions.md` (`TD-012`), `docs/architecture.md`, `docs/deployment_guide.md`, `docs/implementation-plan.md`, `agents/decision-log.md`, and `agents/troubleshooting.md`
+- **Verification**:
+  - Largest Git blob in `refs/heads/main`: `0.23 MB` (`reports/figures/actual_vs_predicted.png`)
+  - `python -m ruff check Data/data_download.py src tests`: `All checks passed!`
+  - `python -m pytest -v`: `49 passed` (`46` unit/model/training-flow tests + `3` FastAPI `TestClient` integration tests) without requiring `Data/house_prices.csv` in Git.

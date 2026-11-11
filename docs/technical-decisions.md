@@ -5,11 +5,11 @@
 ---
 
 ## TD-001: Keep Raw Dataset at `Data/house_prices.csv`
-- **Date**: 2026-11-12 (Phase 0)
-- **Status**: Accepted
-- **Context**: `Data/house_prices.csv` (106.15 MB) is already tracked in Git commit `b08cdf7`. Moving it to `data/raw/house_prices.csv` would duplicate or rewrite a large binary blob in Git history.
-- **Decision**: Keep the immutable raw dataset at `Data/house_prices.csv` and configure `config/config.yaml` to point to `Data/house_prices.csv`, while using `data/processed/` for generated train/test splits.
-- **Consequences**: Zero unnecessary Git repository bloat; all modules must load the path via config rather than hardcoding.
+- **Date**: 2026-11-12 (Phase 0; updated post-Phase 16 via TD-012)
+- **Status**: Superseded in part by [TD-012](#td-012-exclude-raw-dataset-datahouse_pricescsv-from-git-history--automate-download)
+- **Context**: `Data/house_prices.csv` (106.15 MB / 101.05 MiB) was initially added in the root commit.
+- **Decision**: Keep the immutable local raw dataset path at `Data/house_prices.csv` and configure `config/config.yaml` to point to `Data/house_prices.csv`, while using `data/processed/` for generated train/test splits.
+- **Consequences**: Consistent config-driven data loading across all modules; see TD-012 for Git exclusion and automated Kaggle staging.
 
 ## TD-002: Use File + MLflow Persistence Instead of an RDBMS
 - **Date**: 2026-11-12 (Phase 0)
@@ -80,3 +80,10 @@
 - **Context**: Automated retraining triggered by data drift, performance alerts, or model age must never overwrite a healthy production pipeline with a regressed candidate or leave partial files during concurrent API reads.
 - **Decision**: Require candidate approval (`min_r2 >= 0.75`, `max_mae <= 2.8M INR`, `r2_delta >= -0.005`, `mae_regression <= 2.0%`), archive immutable semantic versions under `models/versions/vX.Y.Z/`, and swap active artifacts atomically via temporary files + `os.replace`.
 - **Consequences**: Prevents model quality regressions in production and provides deterministic one-command rollback to any prior version.
+
+## TD-012: Exclude Raw Dataset (`Data/house_prices.csv`) from Git History & Automate Download
+- **Date**: 2026-11-12 (Post-Phase 16)
+- **Status**: Accepted
+- **Context**: GitHub rejected `git push origin main` (`GH001`) because `Data/house_prices.csv` (`101.05 MiB` blob) exceeded GitHub's `100.00 MB` file size limit. Tracking it in Git LFS would require `git-lfs` on every collaborator/CI environment and consume GitHub Free's `1 GB/month` LFS bandwidth quota. Meanwhile, all `pytest` tests and Docker runtime builds already execute without `Data/house_prices.csv`.
+- **Decision**: Strip `Data/house_prices.csv` from Git commit history, add `Data/house_prices.csv` and `data/raw/` to `.gitignore`, and enhance `Data/data_download.py` so running `python Data/data_download.py` (or `make download-data`) automatically downloads `juhibhojani/house-price` via `kagglehub` and places `Data/house_prices.csv` locally without overwriting an existing copy unless `--force` is passed.
+- **Consequences**: Repository shrinks to ~7 MiB and pushes cleanly to GitHub with zero LFS quota dependency; tests, ruff, and CI Docker builds work out of the box without the dataset, while teammates fetch the full dataset in one command before training.

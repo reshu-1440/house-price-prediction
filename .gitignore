@@ -18,7 +18,9 @@ dist/
 htmlcov/
 .ruff_cache/
 
-# Generated data, models & tracking stores
+# Generated data, raw dataset (>100 MB GitHub limit), models & tracking stores
+Data/house_prices.csv
+data/raw/
 data/processed/
 Data/processed/
 models/*.joblib

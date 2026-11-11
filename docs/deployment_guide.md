@@ -9,7 +9,12 @@ This guide covers deploying the House Price Prediction FastAPI service to AWS us
 - AWS CLI v2 configured via IAM user profile or GitHub Actions OIDC (`AWS_DEPLOY_ROLE_ARN`) — never commit access keys.
 - Docker Engine / Buildx installed locally or running in CI.
 - Existing VPC ID and at least two subnet IDs across distinct Availability Zones.
-- Trained model artifact (`models/house_price_pipeline.joblib` + `models/metadata.json`) generated via `python -m src.pipeline.training_pipeline`.
+- Trained model artifact (`models/house_price_pipeline.joblib` + `models/metadata.json`) generated via:
+  ```bash
+  python Data/data_download.py
+  python -m src.pipeline.training_pipeline
+  ```
+  *(Note: `models/*.joblib` and `Data/house_prices.csv` are gitignored. Docker builds succeed without them, and `/health` reports `degraded` until `models/house_price_pipeline.joblib` is present or mounted at `MODEL_PATH`.)*
 
 ---
 

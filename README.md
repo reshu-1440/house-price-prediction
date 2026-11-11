@@ -15,28 +15,57 @@ An end-to-end machine learning engineering workflow to predict residential prope
 
 ---
 
-## 2. Repository Structure (Current & Planned)
+## 2. Repository Structure
 
 - `AGENTS.md` & `agents/` — AI coding agent instructions, standards, workflows, and decision log
-- `docs/` — Project documentation, architecture, roadmap, data schemas, and verified implementation results
-- `config/config.yaml` — Central project configuration
-- `Data/house_prices.csv` — Immutable raw dataset
-- `src/` — Modular ML engineering package (`utils/`, `data/`, and upcoming `features/`, `models/`, `pipeline/`, `api/`, `monitoring/`, `retraining/`)
-- `tests/` — Automated tests (expanded phase by phase)
+- `docs/` — Project documentation, architecture, roadmap, data schemas, deployment, and verified implementation results
+- `config/` — Central YAML configuration (`config.yaml`, `hyperparameters.yaml`, `production.yaml`, `monitoring_thresholds.yaml`, `retraining.yaml`)
+- `Data/data_download.py` — Automated Kaggle dataset downloader staging `Data/house_prices.csv` (raw CSV is gitignored because it exceeds GitHub's 100 MB limit)
+- `src/` — Modular ML engineering package (`utils/`, `data/`, `features/`, `models/`, `pipeline/`, `api/`, `monitoring/`, `retraining/`)
+- `tests/` — Unit, integration, and model quality/fairness tests (`pytest`)
+- `infrastructure/`, `scripts/`, `Dockerfile`, `docker-compose.yml`, `.github/workflows/` — Containerization, CI/CD, and AWS ECS deployment
 
 ---
 
-## 3. Quickstart (Windows PowerShell)
+## 3. Quickstart for Teammates (Clone & Run)
+
+### Option A — Run Tests, Lint & Container Build (No Dataset Required)
+
+All `pytest` tests and `ruff` checks use self-contained synthetic fixtures and run immediately after cloning:
 
 ```powershell
-# Activate virtual environment
+# 1. Create and activate virtual environment (Windows PowerShell)
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 
-# Install package in editable mode
-pip install -e .
+# 2. Install dependencies and package in editable mode
+pip install -r requirements.txt
+pip install --no-build-isolation --no-deps -e .
 
-# Verify configuration and raw dataset loading
+# 3. Verify lint and tests without downloading the 101 MB dataset
+python -m ruff check src tests
+python -m pytest -v
+```
+
+### Option B — Full Training, Local Serving & Deployment (With Dataset)
+
+Because `Data/house_prices.csv` (`101.05 MB`) exceeds GitHub's `100 MB` file limit, it is gitignored and fetched cleanly from Kaggle:
+
+```powershell
+# 1. Download Data/house_prices.csv via kagglehub
+python Data/data_download.py
+
+# 2. Verify dataset loading
 python -m src.data.load_data
+
+# 3. Train and serialize models/house_price_pipeline.joblib
+python -m src.pipeline.training_pipeline
+
+# 4. Serve FastAPI predictions locally (http://127.0.0.1:8000/docs)
+uvicorn src.api.app:app --host 0.0.0.0 --port 8000
+
+# 5. Or build & start Docker Compose services (API + MLflow)
+docker compose up -d --build
 ```
 
 ---

@@ -8,7 +8,7 @@
 
 | Phase | Name | Status | Dependencies | Target Commit Scope |
 |-------|------|--------|--------------|---------------------|
-| 0 | Project Documentation & AI Agent Configuration | `Completed` | Initial repo (`b08cdf7`) | `AGENTS.md`, `docs/`, `agents/` |
+| 0 | Project Documentation & AI Agent Configuration | `Completed` | Initial repo | `AGENTS.md`, `docs/`, `agents/` |
 | 1 | Problem Definition & Data Sourcing | `Completed` | Phase 0 | `README.md`, `config/`, `src/data/load_data.py`, `requirements.txt`, `setup.py` |
 | 2 | Data Understanding & EDA | `Completed` | Phase 1 | `src/data/eda.py`, `notebooks/01_eda.py`, `reports/` |
 | 3 | Data Cleaning & Validation | `Completed` | Phase 2 | `src/data/cleaning.py`, `src/data/validators.py`, `tests/unit/test_cleaning.py` |

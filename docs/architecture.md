@@ -8,7 +8,7 @@
 ## 1. Current Repository State `[Implemented]`
 
 All planned engineering layers (Phases 0–16) are implemented in `src/`, `config/`, `tests/`, `docs/`, `agents/`, `infrastructure/`, `scripts/`, and `.github/workflows/`:
-- **Raw Dataset `[Implemented]`**: `Data/house_prices.csv` (187,531 listings × 21 columns, 106.15 MB, committed in `b08cdf7`).
+- **Raw Dataset `[Local / Gitignored]`**: `Data/house_prices.csv` (187,531 listings × 21 columns, 106.15 MB; excluded from Git via `.gitignore` and downloaded via `Data/data_download.py`).
 - **Legacy Prototypes `[Prototype]`**: `Data/data_check.py`, `Data/data_cleaning.py` (superseded by `src/data/`).
 - **Production ML System `[Implemented]`**: Config/utils, EDA, cleaning & validation, feature transformers, leakage-safe stratified/geo splitting, regression benchmark & Optuna HPO (`lightgbm` champion), residual/segment evaluation, MLflow SQLite tracking & `@production` registry, unified sklearn `Pipeline` (`models/house_price_pipeline.joblib`), FastAPI service, pytest suite, Docker & GitHub Actions CI/CD, AWS CloudFormation IaC, drift/performance monitoring, and automated retraining/versioning/rollback.
 

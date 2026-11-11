@@ -72,3 +72,48 @@ def test_get_dataset_overview_detects_index_masked_duplicates() -> None:
     assert overview["unique_locations"] == 2
     assert overview["exact_duplicates_all_cols"] == 0
     assert overview["duplicates_excluding_index"] == 1
+
+
+def test_load_raw_data_missing_file_hints_download_script(tmp_path: Path) -> None:
+    with pytest.raises(FileNotFoundError, match="Data/data_download.py"):
+        load_raw_data(data_path=tmp_path / "missing.csv")
+
+
+def test_data_download_stages_csv_and_respects_force(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import importlib.util
+
+    script_path = get_project_root() / "Data" / "data_download.py"
+    spec = importlib.util.spec_from_file_location("data_download", script_path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    cache_dir = tmp_path / "kaggle_cache"
+    cache_dir.mkdir()
+    (cache_dir / "house_prices.csv").write_text("Index,Title\n0,2 BHK\n", encoding="utf-8")
+
+    calls: list[str] = []
+
+    def _fake_download(slug: str) -> str:
+        calls.append(slug)
+        return str(cache_dir)
+
+    monkeypatch.setattr(module.kagglehub, "dataset_download", _fake_download)
+
+    out_path = tmp_path / "Data" / "house_prices.csv"
+    staged = module.download_dataset(output_path=out_path)
+    assert staged == out_path.resolve()
+    assert out_path.read_text(encoding="utf-8") == "Index,Title\n0,2 BHK\n"
+    assert len(calls) == 1
+
+    # Calling again without force skips download
+    module.download_dataset(output_path=out_path)
+    assert len(calls) == 1
+
+    # Calling with force refreshes file
+    (cache_dir / "house_prices.csv").write_text("Index,Title\n0,3 BHK\n", encoding="utf-8")
+    module.download_dataset(output_path=out_path, force=True)
+    assert len(calls) == 2
+    assert out_path.read_text(encoding="utf-8") == "Index,Title\n0,3 BHK\n"

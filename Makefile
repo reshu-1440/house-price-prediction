@@ -1,10 +1,13 @@
 PYTHON := .venv/Scripts/python.exe
 
-.PHONY: install lint test test-unit test-cov eda split train evaluate mlflow-train pipeline serve
+.PHONY: install download-data lint test test-unit test-cov eda split train evaluate mlflow-train pipeline serve
 
 install:
 	$(PYTHON) -m pip install -r requirements.txt
 	$(PYTHON) -m pip install --no-build-isolation --no-deps -e .
+
+download-data:
+	$(PYTHON) Data/data_download.py
 
 lint:
 	$(PYTHON) -m ruff check src tests

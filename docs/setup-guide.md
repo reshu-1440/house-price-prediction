@@ -8,46 +8,49 @@
 
 - Git installed and configured
 - Python `3.13.x` virtual environment at `.venv`
-- Kaggle credentials (only needed if re-downloading `Data/house_prices.csv`; the CSV is already committed in `Data/house_prices.csv`)
+- `Data/house_prices.csv` is **gitignored** (because it is `101.05 MB` and exceeds GitHub's `100 MB` limit). When cloning onto a new machine, run `python Data/data_download.py` to download it from Kaggle (`juhibhojani/house-price`) into `Data/house_prices.csv`. (For most public Kaggle datasets `kagglehub` downloads directly; if prompted for auth, configure `~/.kaggle/kaggle.json` or `KAGGLE_USERNAME`/`KAGGLE_KEY`.)
 
 ---
 
-## 2. Current Environment Setup `[Verified]`
+## 2. Environment Setup on a Fresh Clone
 
 Activate the virtual environment in Windows PowerShell:
 
 ```powershell
 cd d:\Room_Project\house_price_prediction
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python -m pip install --no-build-isolation --no-deps -e .
 python --version
 ```
 
-Verify current installed packages:
+Verify installed packages:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip list
 ```
 
-Currently verified packages in `.venv`:
-- `pandas==3.1.1`
-- `numpy==2.5.4`
-- `kagglehub==1.0.3`
-- `PyYAML==6.0.3`
-- `requests==2.34.2`
-- `setuptools==84.2.1`
-- `wheel==0.48.0`
-- `pytest==9.2.0`
-- `house-price-prediction==0.1.0` (editable install via `pip install --no-build-isolation --no-deps -e .`)
-
 ---
 
-## 3. Dataset Verification `[Verified]`
+## 3. Running Without vs. With the Dataset
 
-Confirm `Data/house_prices.csv` is accessible and loads via `src.data.load_data`:
-
-```powershell
-.\.venv\Scripts\python.exe -m src.data.load_data
-```
+- **Without `Data/house_prices.csv`**:
+  - Linting (`python -m ruff check src tests`), unit/integration/model tests (`python -m pytest -v`), and `docker build --target runtime .` work out of the box using deterministic synthetic test fixtures.
+  - Note: Without a trained `models/house_price_pipeline.joblib`, the FastAPI `/health` endpoint starts in `degraded` mode (`model_loaded: false`) and `/predict` returns `503` until training runs or a model artifact is provided via `MODEL_PATH`.
+- **With `Data/house_prices.csv` (Full Training & Serving)**:
+  1. Download and stage the CSV:
+     ```powershell
+     .\.venv\Scripts\python.exe Data/data_download.py
+     ```
+  2. Verify dataset loading (`(187531, 21)`):
+     ```powershell
+     .\.venv\Scripts\python.exe -m src.data.load_data
+     ```
+  3. Generate `models/house_price_pipeline.joblib` and `models/metadata.json`:
+     ```powershell
+     .\.venv\Scripts\python.exe -m src.pipeline.training_pipeline
+     ```
 
 ---
 
@@ -59,11 +62,13 @@ Confirm `Data/house_prices.csv` is accessible and loads via `src.data.load_data`
 
 ---
 
-## 5. Planned Setup Steps `[Planned: Phases 2, 11, 13]`
+## 5. Serving & Docker Startup
 
-- **Phase 2+**: Additional ML/visualization/API packages added incrementally per phase in `requirements.txt`.
-- **Phase 11**: Run FastAPI server locally via `uvicorn src.api.app:app --reload`.
-- **Phase 13 (Docker)**: Build and run containerized API + MLflow services once Docker Desktop is running:
+- **Local FastAPI server**:
+  ```powershell
+  .\.venv\Scripts\python.exe -m uvicorn src.api.app:app --reload
+  ```
+- **Docker Compose (API + MLflow)**:
   ```powershell
   docker compose up -d --build
   ```
