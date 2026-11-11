@@ -15,6 +15,8 @@
 - `PyYAML==6.0.3` — Configuration loading
 - `kagglehub==1.0.3` — Dataset acquisition
 - `requests==2.34.2` — HTTP client
+- `setuptools==84.2.1`, `wheel==0.48.0` — Packaging & editable installs
+- `pytest==9.2.0` — Test runner
 
 ## 3. Planned Stack by Phase `[Planned]`
 - **EDA & Visualization (Phase 2, 8)**: `matplotlib`, `seaborn`, `scipy`

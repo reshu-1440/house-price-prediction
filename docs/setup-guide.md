@@ -34,22 +34,33 @@ Currently verified packages in `.venv`:
 - `kagglehub==1.0.3`
 - `PyYAML==6.0.3`
 - `requests==2.34.2`
+- `setuptools==84.2.1`
+- `wheel==0.48.0`
+- `pytest==9.2.0`
+- `house-price-prediction==0.1.0` (editable install via `pip install --no-build-isolation --no-deps -e .`)
 
 ---
 
 ## 3. Dataset Verification `[Verified]`
 
-Confirm `Data/house_prices.csv` is accessible and has shape `(187531, 21)`:
+Confirm `Data/house_prices.csv` is accessible and loads via `src.data.load_data`:
 
 ```powershell
-.\.venv\Scripts\python.exe -c "import pandas as pd; df = pd.read_csv('Data/house_prices.csv', low_memory=False); print(df.shape)"
+.\.venv\Scripts\python.exe -m src.data.load_data
 ```
 
 ---
 
-## 4. Planned Setup Steps `[Planned: Phases 1, 11–13]`
+## 4. Test Execution `[Verified]`
 
-- **Phase 1**: Install project dependencies from `requirements.txt` and editable package install (`pip install -e .`).
+```powershell
+.\.venv\Scripts\python.exe -m pytest -v
+```
+
+---
+
+## 5. Planned Setup Steps `[Planned: Phases 2, 11, 13]`
+
+- **Phase 2+**: Additional ML/visualization/API packages added incrementally per phase in `requirements.txt`.
 - **Phase 11**: Run FastAPI server locally via `uvicorn src.api.app:app --reload`.
-- **Phase 12**: Run test suite via `pytest`.
 - **Phase 13**: Build and run containerized services via `docker compose up --build`.

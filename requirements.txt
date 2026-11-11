@@ -1,0 +1,11 @@
+# Core data & configuration dependencies (Phase 1 verified)
+numpy>=2.0.0
+pandas>=2.2.0
+PyYAML>=6.0.0
+kagglehub>=1.0.0
+requests>=2.31.0
+
+# Packaging & testing
+setuptools>=75.0.0
+wheel>=0.45.0
+pytest>=8.0.0

@@ -1,0 +1,32 @@
+project:
+  name: house-price-prediction
+  version: "0.1.0"
+  description: End-to-end Indian residential property price prediction system
+  random_seed: 42
+
+data:
+  raw_path: Data/house_prices.csv
+  processed_dir: data/processed
+  target_raw_column: Amount(in rupees)
+  target_column: Price_in_rupees
+  leakage_columns:
+    - Price (in rupees)
+  index_column: Index
+  drop_always_null_columns:
+    - Dimensions
+    - Plot Area
+  valid_transactions:
+    - Resale
+    - New Property
+  # Set to null to include all 81 cities, or provide a list of city slugs
+  cities: null
+
+splitting:
+  test_size: 0.2
+  random_state: 42
+
+paths:
+  reports_dir: reports
+  figures_dir: reports/figures
+  models_dir: models
+  mlflow_dir: mlflow_experiments
