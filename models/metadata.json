@@ -1,7 +1,7 @@
 {
   "model_name": "lightgbm",
   "model_version": "0.1.0",
-  "trained_at_utc": "2026-11-11T20:14:38.481254+00:00",
+  "trained_at_utc": "2026-11-11T20:41:06.705116+00:00",
   "train_samples": 51568,
   "test_samples": 12892,
   "feature_count": 50,

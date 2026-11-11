@@ -300,3 +300,20 @@
   - `python -m ruff check src tests`: `All checks passed!`.
   - `python -m pytest tests/unit/test_monitoring.py -v`: `2 passed` (verified drift alerts trigger on shifted data & degraded metrics).
   - Baseline vs. held-out test check (`1,000` samples each): `Data drift detected: False`, `Pred drift: False`, `Alert: False`; generated `reports/monitoring/monitoring_dashboard.html` and drift report artifacts.
+- **Commit**: `e2f64e3` (`Phase 15: Monitoring system for data drift, prediction drift, and model performance`)
+
+---
+
+## Phase 16 — Model Retraining
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `config/retraining.yaml`
+  - `src/retraining/__init__.py`, `src/retraining/retrain.py` (`check_retraining_trigger`, `compare_models`, `approve_model`, `replace_production_model`, `retrain_model`), `src/retraining/scheduler.py` (`compute_model_age_days`, `evaluate_and_run_scheduled_retraining`, CLI `--dry-run`/`--force`), `src/retraining/versioning.py` (`bump_semver`, `list_model_versions`, `version_model`, `rollback_model`)
+  - `docs/retraining_guide.md`, updated `docs/README.md` & `docs/architecture.md`
+  - `tests/unit/test_retraining.py`
+- **Verification**:
+  - `python -m ruff check src tests`: `All checks passed!`.
+  - `python -m src.retraining.scheduler --dry-run`: returned `status: dry_run`, `cron_schedule: 0 2 * * 0`, `should_retrain: false`.
+  - `python -m src.retraining.scheduler --force`: trained candidate end-to-end, passed champion/challenger gate (`R² = 0.8128`, `MAE = ₹2,206,793.51`, `r2_delta = 0.0`), archived `models/versions/v0.1.0/`, and atomically swapped `models/house_price_pipeline.joblib` (`status: promoted`).
+  - `python -m pytest --cov=src --cov-report=term-missing -v`: **`47 passed`** (`83%` statement coverage across `2,254` statements in `src/`).

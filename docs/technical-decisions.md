@@ -73,3 +73,10 @@
 - **Context**: MLflow `3.18.0` defaults `mlflow.sklearn.log_model` to `skops` serialization, which rejects third-party estimator classes (`LGBMRegressor`, `XGBRegressor`, `collections.OrderedDict`) without exhaustive allowlists, and uses model aliases (`@production`) instead of legacy stages.
 - **Decision**: Use local SQLite tracking URI (`sqlite:///mlflow_experiments/mlflow.db`), `serialization_format=cloudpickle` for trusted local model artifacts, and MLflow 3.x registered model aliases (`@production` / `@staging`) in `src/models/mlflow_tracking.py`.
 - **Consequences**: Clean, reproducible model registry lifecycle supporting custom sklearn/boosting wrappers and zero-skew prediction reloads.
+
+## TD-011: Champion/Challenger Gate with Atomic `os.replace` Versioned Swaps
+- **Date**: 2026-11-12 (Phase 16)
+- **Status**: Accepted
+- **Context**: Automated retraining triggered by data drift, performance alerts, or model age must never overwrite a healthy production pipeline with a regressed candidate or leave partial files during concurrent API reads.
+- **Decision**: Require candidate approval (`min_r2 >= 0.75`, `max_mae <= 2.8M INR`, `r2_delta >= -0.005`, `mae_regression <= 2.0%`), archive immutable semantic versions under `models/versions/vX.Y.Z/`, and swap active artifacts atomically via temporary files + `os.replace`.
+- **Consequences**: Prevents model quality regressions in production and provides deterministic one-command rollback to any prior version.

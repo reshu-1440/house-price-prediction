@@ -1,25 +1,20 @@
 # System Architecture
 
-> **Last Updated**: Phase 0 (Documentation & Agent Configuration)
-> **Legend**: `[Implemented]` = present and verified in repo · `[Prototype]` = exploratory draft in `Data/` · `[Planned]` = scheduled in future phase
+> **Last Updated**: Phase 16 (All 17 Phases — Phase 0 through Phase 16 — Implemented)
+> **Legend**: `[Implemented]` = present and verified in repo · `[Prototype]` = exploratory draft in `Data/`
 
 ---
 
-## 1. Current Repository State `[Implemented / Prototype]`
+## 1. Current Repository State `[Implemented]`
 
-Currently, the repository contains:
+All planned engineering layers (Phases 0–16) are implemented in `src/`, `config/`, `tests/`, `docs/`, `agents/`, `infrastructure/`, `scripts/`, and `.github/workflows/`:
 - **Raw Dataset `[Implemented]`**: `Data/house_prices.csv` (187,531 listings × 21 columns, 106.15 MB, committed in `b08cdf7`).
-- **Dataset Download Script `[Implemented]`**: `Data/data_download.py` using `kagglehub` (`juhibhojani/house-price`).
-- **Exploratory Prototypes `[Prototype]`** (untracked drafts predating Phase 1 refactoring):
-  - `Data/data_check.py`: quick inspection of shape, nulls, locations, categories.
-  - `Data/data_cleaning.py`: initial price parsing (`Lac`/`Cr`), `Resale`/`New Property` filtering, and 3-city filtering (`new-delhi`, `bangalore`, `ahmedabad`).
-- **Knowledge Base `[Implemented]`**: `AGENTS.md`, `docs/`, and `agents/`.
-
-No `src/` Python package, trained model, API service, or CI/CD workflow exists yet; these are built sequentially in Phases 1–16.
+- **Legacy Prototypes `[Prototype]`**: `Data/data_check.py`, `Data/data_cleaning.py` (superseded by `src/data/`).
+- **Production ML System `[Implemented]`**: Config/utils, EDA, cleaning & validation, feature transformers, leakage-safe stratified/geo splitting, regression benchmark & Optuna HPO (`lightgbm` champion), residual/segment evaluation, MLflow SQLite tracking & `@production` registry, unified sklearn `Pipeline` (`models/house_price_pipeline.joblib`), FastAPI service, pytest suite, Docker & GitHub Actions CI/CD, AWS CloudFormation IaC, drift/performance monitoring, and automated retraining/versioning/rollback.
 
 ---
 
-## 2. Target End-to-End Architecture `[Planned: Phases 1–16]`
+## 2. End-to-End Architecture `[Implemented]`
 
 ```text
 [Data/house_prices.csv (Immutable Raw)]
@@ -54,7 +49,7 @@ No `src/` Python package, trained model, API service, or CI/CD workflow exists y
 
 ---
 
-## 3. Target Module Boundaries `[Planned]`
+## 3. Module Boundaries `[Implemented]`
 
 | Layer | Directory | Responsibility | Allowed Dependencies |
 |-------|-----------|----------------|----------------------|

@@ -1,0 +1,20 @@
+schedule:
+  cron: "0 2 * * 0"
+  min_days_between_runs: 7
+  min_new_samples: 1000
+
+triggers:
+  retrain_on_data_drift: true
+  retrain_on_performance_alert: true
+  max_model_age_days: 30
+
+approval:
+  min_r2: 0.75
+  min_r2_improvement_over_champion: -0.005
+  max_mae_inr: 2800000.0
+  max_mae_regression_pct: 2.0
+
+versioning:
+  versions_dir: "models/versions"
+  production_path: "models/house_price_pipeline.joblib"
+  keep_last_versions: 5

@@ -24,7 +24,7 @@
 | 13 | Docker & CI/CD | `Completed` | Phase 11, 12 | `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `.github/workflows/`, `scripts/` |
 | 14 | Cloud Deployment | `Completed` | Phase 11, 13 | `infrastructure/cloudformation.yaml`, `config/production.yaml`, `scripts/aws_deploy.sh`, `docs/deployment_guide.md` |
 | 15 | Monitoring | `Completed` | Phase 10, 11 | `src/monitoring/`, `config/monitoring_thresholds.yaml`, `tests/unit/test_monitoring.py` |
-| 16 | Model Retraining | `Pending` | Phase 9, 10, 15 | `src/retraining/`, `config/retraining.yaml`, `docs/retraining_guide.md`, `tests/unit/test_retraining.py` |
+| 16 | Model Retraining | `Completed` | Phase 9, 10, 15 | `src/retraining/`, `config/retraining.yaml`, `docs/retraining_guide.md`, `tests/unit/test_retraining.py` |
 
 ---
 
