@@ -234,3 +234,20 @@
 - **Verification**:
   - `python -m pytest -v`: `35 passed` (including `TestClient` tests for `/health`, `/model/info`, `/predict`, `/predict/batch`, `422` validation errors, and `503` unloaded-model behavior).
   - Live `uvicorn` HTTP server probe (`127.0.0.1:8012`): `/health` -> `200` (`healthy`), `/predict` -> `200` (`₹1.34 Cr`), `/predict/batch` -> `200` (`count=2`), invalid payload -> `422`.
+- **Commit**: `2a02a04` (`Phase 11: FastAPI backend with Pydantic validation and prediction endpoints`)
+
+---
+
+## Phase 12 — Testing
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `tests/conftest.py` (shared raw DataFrame, fast fitted pipeline, and API `TestClient` fixtures)
+  - `tests/integration/__init__.py`, `tests/integration/test_api.py`, `tests/integration/test_training_flow.py`
+  - `tests/model/__init__.py`, `tests/model/test_model_quality.py`, `tests/model/test_model_fairness.py`
+  - `pytest.ini`, `pyproject.toml`, `Makefile`
+  - Cleaned all lint findings across `src/` and `tests/` (`ruff`) and eliminated Pandas4 string-fill warning in `src/data/cleaning.py`
+  - Updated `requirements.txt` with `pytest-cov>=5.0.0` and `ruff>=0.6.0`
+- **Verification**:
+  - `python -m ruff check src tests`: `All checks passed!` (`0` errors).
+  - `python -m pytest --cov=src --cov-report=term-missing -v`: `41 passed` (`34` unit, `4` integration, `3` model tests; `82%` total statement coverage across `src/`, `97%` on `src/api/app.py`, `98%` on `src/data/validators.py` and `src/data/eda.py`).

@@ -21,7 +21,8 @@
 3. **Strict Truthfulness**:
    - Never mock away the logic you claim to test in unit tests, and never relax assertions just to force a green test run.
    - Only report tests as passing after running `pytest` after your final edit.
-4. **Execution Command**:
+4. **Execution Commands**:
    ```powershell
-   .\.venv\Scripts\python.exe -m pytest -v
+   .\.venv\Scripts\python.exe -m pytest --cov=src --cov-report=term-missing -v
+   .\.venv\Scripts\python.exe -m ruff check src tests
    ```

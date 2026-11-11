@@ -1,13 +1,10 @@
-"""Unit tests for Phase 11 Pydantic API schemas and FastAPI endpoints."""
+"""Unit tests for Phase 11 Pydantic API schemas."""
 
 from __future__ import annotations
 
 import pytest
-from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
-from src.api.app import app
-from src.api.dependencies import model_state
 from src.api.schemas import (
     BatchPredictionRequest,
     HousePredictionRequest,
@@ -47,58 +44,3 @@ def test_house_prediction_request_validation_and_formatting() -> None:
 
     with pytest.raises(ValidationError):
         BatchPredictionRequest(items=[])
-
-
-def test_api_endpoints_with_loaded_and_unloaded_model() -> None:
-    model_state.clear()
-    with TestClient(app) as client:
-        # Lifespan loads models/house_price_pipeline.joblib automatically
-        health = client.get("/health")
-        assert health.status_code == 200
-        assert health.json()["status"] == "healthy"
-        assert health.json()["model_loaded"] is True
-
-        info = client.get("/model/info")
-        assert info.status_code == 200
-        assert info.json()["feature_count"] == 50
-
-        pred_resp = client.post(
-            "/predict",
-            json={
-                "location": "bangalore",
-                "area_sqft": 1500.0,
-                "bhk": 3,
-                "bathroom": 3,
-                "balcony": 2,
-                "transaction": "New Property",
-            },
-        )
-        assert pred_resp.status_code == 200
-        body = pred_resp.json()
-        assert body["predicted_price_inr"] > 0
-        assert "X-Process-Time-Ms" in pred_resp.headers
-
-        batch_resp = client.post(
-            "/predict/batch",
-            json={
-                "items": [
-                    {"location": "new-delhi", "area_sqft": 1200.0, "bhk": 2, "bathroom": 2},
-                    {"location": "mumbai", "area_sqft": 1600.0, "bhk": 3, "bathroom": 3},
-                ]
-            },
-        )
-        assert batch_resp.status_code == 200
-        assert batch_resp.json()["count"] == 2
-
-        invalid_resp = client.post(
-            "/predict",
-            json={"location": "pune", "area_sqft": -10, "bhk": 0, "bathroom": 1},
-        )
-        assert invalid_resp.status_code == 422
-
-        model_state.clear()
-        unavail_resp = client.post(
-            "/predict",
-            json={"location": "pune", "area_sqft": 1000, "bhk": 2, "bathroom": 2},
-        )
-        assert unavail_resp.status_code == 503

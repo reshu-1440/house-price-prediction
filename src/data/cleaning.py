@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -233,7 +234,7 @@ def handle_missing_values(
             )
 
     if "Description" in out.columns:
-        out["Description"] = out["Description"].fillna("").astype(str)
+        out["Description"] = out["Description"].astype("string").fillna("").astype(str)
 
     raw_count_cols = [c for c in ("Bathroom", "Balcony", "Car Parking") if c in out.columns]
     if raw_count_cols:

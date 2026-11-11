@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from collections.abc import Iterable
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import joblib
 import numpy as np
-import pandas as pd
 import yaml
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
@@ -169,7 +169,7 @@ def run_training_pipeline(
     metadata = {
         "model_name": best_name,
         "model_version": config["project"].get("version", "0.1.0"),
-        "trained_at_utc": datetime.now(timezone.utc).isoformat(),
+        "trained_at_utc": datetime.now(UTC).isoformat(),
         "train_samples": int(len(X_train_raw)),
         "test_samples": int(len(X_test_raw)),
         "feature_count": len(feature_names),

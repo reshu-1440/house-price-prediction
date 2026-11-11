@@ -26,6 +26,10 @@ uvicorn>=0.32.0
 pydantic>=2.9.0
 httpx>=0.27.0
 
+# Coverage & linting (Phase 12 verified)
+pytest-cov>=5.0.0
+ruff>=0.6.0
+
 # Packaging & testing
 setuptools>=75.0.0
 wheel>=0.45.0

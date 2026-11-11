@@ -7,7 +7,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from src.data.cleaning import parse_area_columns, parse_car_parking, handle_missing_values
+from src.data.cleaning import handle_missing_values, parse_area_columns, parse_car_parking
 
 
 def predict(model: Any, X: pd.DataFrame) -> np.ndarray:

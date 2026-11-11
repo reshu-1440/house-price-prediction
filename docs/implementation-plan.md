@@ -20,7 +20,7 @@
 | 9 | MLflow & Model Management | `Completed` | Phase 6–8 | `src/models/mlflow_tracking.py`, `mlflow_experiments/` |
 | 10 | ML Pipeline Development | `Completed` | Phase 3–9 | `src/pipeline/training_pipeline.py`, `src/pipeline/inference_pipeline.py`, `models/` |
 | 11 | Backend Development | `Completed` | Phase 10 | `src/api/{app,schemas,dependencies,middleware}.py`, `docs/api-documentation.md` |
-| 12 | Testing | `Pending` | Phase 1–11 | `tests/{unit,integration,model}/`, `pytest.ini`, `Makefile` |
+| 12 | Testing | `Completed` | Phase 1–11 | `tests/{unit,integration,model}/`, `pytest.ini`, `Makefile` |
 | 13 | Docker & CI/CD | `Pending` | Phase 11, 12 | `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `.github/workflows/`, `scripts/` |
 | 14 | Cloud Deployment | `Pending` | Phase 11, 13 | `infrastructure/cloudformation.yaml`, `config/production.yaml`, `scripts/aws_deploy.sh`, `docs/deployment_guide.md` |
 | 15 | Monitoring | `Pending` | Phase 10, 11 | `src/monitoring/`, `config/monitoring_thresholds.yaml`, `tests/unit/test_monitoring.py` |
