@@ -63,4 +63,7 @@ Confirm `Data/house_prices.csv` is accessible and loads via `src.data.load_data`
 
 - **Phase 2+**: Additional ML/visualization/API packages added incrementally per phase in `requirements.txt`.
 - **Phase 11**: Run FastAPI server locally via `uvicorn src.api.app:app --reload`.
-- **Phase 13**: Build and run containerized services via `docker compose up --build`.
+- **Phase 13 (Docker)**: Build and run containerized API + MLflow services once Docker Desktop is running:
+  ```powershell
+  docker compose up -d --build
+  ```

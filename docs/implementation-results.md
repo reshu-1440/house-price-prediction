@@ -251,3 +251,19 @@
 - **Verification**:
   - `python -m ruff check src tests`: `All checks passed!` (`0` errors).
   - `python -m pytest --cov=src --cov-report=term-missing -v`: `41 passed` (`34` unit, `4` integration, `3` model tests; `82%` total statement coverage across `src/`, `97%` on `src/api/app.py`, `98%` on `src/data/validators.py` and `src/data/eda.py`).
+- **Commit**: `7a91867` (`Phase 12: Comprehensive test suite with unit, integration, and model tests`)
+
+---
+
+## Phase 13 — Docker & CI/CD
+
+- **Status**: `Completed` (local container daemon inactive on host; config & workflows validated)
+- **Deliverables Created/Updated**:
+  - `Dockerfile` (multi-stage `builder`, `trainer`, and non-root `runtime` with `HEALTHCHECK`)
+  - `docker-compose.yml` (`api` + `mlflow` services), `.dockerignore`
+  - `.github/workflows/ci.yml` (`lint-and-test` + `docker-build`), `.github/workflows/cd.yml` (tag/dispatch verification + ECR deploy template)
+  - `scripts/build.sh`, `scripts/deploy.sh`
+- **Verification**:
+  - `docker compose config -q`: exited `0` (valid compose syntax and schema).
+  - YAML & Dockerfile structural validation: `docker-compose.yml`, `.github/workflows/ci.yml`, `.github/workflows/cd.yml`, and `Dockerfile` multi-stage/non-root directives passed.
+  - Note: Docker Desktop daemon (`desktop-linux`) was not running on the host (`docker info` exited `1`), so live `docker build` / container startup was not executed locally.
