@@ -48,3 +48,24 @@
   - Installed `setuptools==84.2.1`, `wheel==0.48.0`, `pytest==9.2.0` and editable package `house-price-prediction==0.1.0` in `.venv`.
   - `python -m pytest tests/unit/test_load_data.py -v`: `6 passed`.
   - `python -m src.data.load_data`: loaded `Data/house_prices.csv` with shape `(187531, 21)`, `81` locations, `0` exact full-row duplicates, `119339` duplicates excluding `Index`, `239.18 MB` memory usage.
+- **Commit**: `051019d` (`Phase 1: Problem definition, project structure, and data sourcing setup`)
+
+---
+
+## Phase 2 — Data Understanding & EDA
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `src/data/eda.py`
+  - `notebooks/01_eda.py`
+  - `tests/unit/test_eda.py`
+  - `reports/eda_summary.md`, `reports/data_quality_report.json`, and 6 plots in `reports/figures/`
+  - Updated `requirements.txt` and `setup.py` with `matplotlib`, `seaborn`, `scipy`
+- **Verified Key Findings**:
+  - `177,847` valid numeric prices (`median = 7,800,000 INR`, `mean = 11,981,344.19 INR`, `P25 = 4,840,000`, `P75 = 14,500,000`, `P99 = 70,000,000`, `max = 14,003,000,000 INR`); `9,684` `Call for Price`.
+  - `Carpet Area` and `Super Area` are mutually exclusive across all `187,531` rows (`Carpet only = 106,858`, `Super only = 79,846`, `Both = 0`, `Neither = 827`).
+  - `> 10` string entries appear `35` times in `Bathroom` and `22` times in `Balcony`.
+  - `Transaction` counts: `Resale = 144,172`, `New Property = 42,565`, `Other = 709`, `NaN = 83`, `Rent/Lease = 2`.
+- **Verification**:
+  - `python -m pytest -v`: `9 passed`.
+  - `python notebooks/01_eda.py`: completed exit code `0`, generated JSON, Markdown, and 6 PNG figures.

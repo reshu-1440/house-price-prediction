@@ -17,6 +17,7 @@
 - `requests==2.34.2` — HTTP client
 - `setuptools==84.2.1`, `wheel==0.48.0` — Packaging & editable installs
 - `pytest==9.2.0` — Test runner
+- `matplotlib==3.11.2`, `seaborn==0.13.2`, `scipy==1.18.1` — EDA, statistical tests & visualization
 
 ## 3. Planned Stack by Phase `[Planned]`
 - **EDA & Visualization (Phase 2, 8)**: `matplotlib`, `seaborn`, `scipy`

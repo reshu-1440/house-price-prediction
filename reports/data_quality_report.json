@@ -1,0 +1,42 @@
+{
+  "total_rows": 187531,
+  "total_columns": 21,
+  "exact_duplicates_all_columns": 0,
+  "duplicates_excluding_index": 119339,
+  "unique_rows_excluding_index": 68192,
+  "call_for_price_count": 9684,
+  "all_null_columns": [
+    "Dimensions",
+    "Plot Area"
+  ],
+  "area_coverage": {
+    "carpet_only": 106858,
+    "super_only": 79846,
+    "both_present": 0,
+    "neither_present": 827
+  },
+  "gt10_string_counts": {
+    "bathroom": 35,
+    "balcony": 22
+  },
+  "transaction_counts": {
+    "Resale": 144172,
+    "New Property": 42565,
+    "Other": 709,
+    "nan": 83,
+    "Rent/Lease": 2
+  },
+  "unique_locations": 81,
+  "top_10_locations": {
+    "new-delhi": 27599,
+    "bangalore": 24030,
+    "kolkata": 22380,
+    "gurgaon": 20070,
+    "ahmedabad": 12750,
+    "hyderabad": 12300,
+    "chennai": 10500,
+    "jaipur": 8490,
+    "greater-noida": 4710,
+    "faridabad": 3840
+  }
+}

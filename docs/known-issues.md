@@ -15,6 +15,7 @@
 | KI-005 | **`Bathroom` and `Balcony` contain `'> 10'` string values**. | `pd.to_numeric(..., errors='coerce')` turns `'> 10'` into `NaN` unless handled explicitly. | Phase 3 parses `'> 10'` cleanly (e.g., capped numeric `11` or explicit handling). |
 | KI-006 | **`Dimensions` and `Plot Area` are 100% null** (187,531 / 187,531). | Zero signal; adds noise if kept. | Phase 3 drops 100%-null columns automatically. |
 | KI-007 | **`Transaction` includes `Rent/Lease` and `Other`** alongside `Resale` and `New Property`. | Rental prices follow a completely different scale than sale prices. | Phase 3 filters to sale transactions (`Resale`, `New Property`). |
+| KI-008 | **Extreme price outliers (`max = 14,003,000,000 INR`, i.e., 1,400.3 Cr vs. P99 = 7 Cr)** and mutually exclusive areas (`Carpet only = 106,858`, `Super only = 79,846`, `Both = 0`, `Neither = 827`). | Extreme prices distort RMSE/linear models; single-area columns leave ~43–57% nulls individually. | Phase 3 handles outliers and unifies `Carpet Area` + `Super Area` into `effective_area_sqft` + `area_type`. |
 
 ---
 

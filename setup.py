@@ -13,5 +13,8 @@ setup(
         "pandas>=2.2.0",
         "PyYAML>=6.0.0",
         "requests>=2.31.0",
+        "matplotlib>=3.9.0",
+        "seaborn>=0.13.0",
+        "scipy>=1.14.0",
     ],
 )
