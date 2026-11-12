@@ -350,6 +350,7 @@
   - `start.bat`: added `--frontend`, `--fullstack` (new default with pre-flight install/artifact checks, auto-port fallback via `scripts/resolve_port.py`, and browser auto-open)
   - `setup.bat`: added Python/Node/npm dependency checks (`--force-install`) and frontend test/build verification
   - `scripts/resolve_port.py` & `tests/unit/test_resolve_port.py`: automatic backend (`8000..8020`) and frontend (`5173..5193`) port resolution with `VITE_API_PROXY_TARGET` wiring in `frontend/vite.config.ts`
+  - `.github/workflows/cd.yml` & `.github/workflows/ci.yml`: fixed `secrets` inside `if:` workflow validation error in `cd.yml` (moved `AWS_DEPLOY_ROLE_ARN` to job `env:`) and added `frontend-check` job (`vitest`, `tsc`, `vite build`) to `ci.yml`
   - `.gitignore`, `README.md`, `docs/{api-documentation,architecture,setup-guide,technical-decisions}.md`, `agents/decision-log.md`
 - **Verification**:
   - `python -m ruff check Data/data_download.py scripts/resolve_port.py src tests`: `All checks passed!`
