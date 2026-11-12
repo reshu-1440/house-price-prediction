@@ -31,8 +31,15 @@ mlflow_experiments/
 # Environment & secrets
 .env
 .env.*
+!.env.example
 *.pem
 *.key
+
+# Frontend dependencies & build outputs
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/*.tsbuildinfo
 
 # IDE & OS
 .vscode/
