@@ -19,13 +19,24 @@ def configure_middleware(
     allowed_origins: list[str] | None = None,
 ) -> None:
     """Attach CORS, structured request logging/timing, and safe 500 error handling."""
-    origins = allowed_origins if allowed_origins is not None else ["http://localhost:3000", "http://localhost:8501"]
+    origins = (
+        allowed_origins
+        if allowed_origins is not None
+        else [
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://localhost:8501",
+        ]
+    )
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
         allow_credentials=False,
         allow_methods=["GET", "POST"],
         allow_headers=["Content-Type", "Authorization"],
+        expose_headers=["X-Process-Time-Ms"],
     )
 
     @app.middleware("http")

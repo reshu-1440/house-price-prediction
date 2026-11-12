@@ -124,3 +124,10 @@ class ModelInfoResponse(BaseModel):
     feature_count: int | None = None
     known_locations_count: int | None = None
     metrics: dict[str, float] = Field(default_factory=dict)
+
+
+class LocationsResponse(BaseModel):
+    """Sorted list of city slugs learned by the active model's location encoder."""
+
+    count: int
+    locations: list[str] = Field(default_factory=list)

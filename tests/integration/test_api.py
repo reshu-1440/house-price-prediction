@@ -22,6 +22,12 @@ def test_health_and_model_info(api_client: TestClient) -> None:
     assert payload["model_name"] == "lightgbm"
     assert "r2" in payload["metrics"]
 
+    locs = api_client.get("/locations")
+    assert locs.status_code == 200
+    locs_payload = locs.json()
+    assert locs_payload["count"] == len(locs_payload["locations"])
+    assert "bangalore" in locs_payload["locations"]
+
 
 def test_predict_and_batch_endpoints(api_client: TestClient) -> None:
     single = api_client.post(

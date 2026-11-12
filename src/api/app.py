@@ -19,6 +19,7 @@ from src.api.schemas import (
     HealthResponse,
     HousePredictionRequest,
     HousePredictionResponse,
+    LocationsResponse,
     ModelInfoResponse,
     format_inr_price,
 )
@@ -78,6 +79,18 @@ def create_app(allowed_origins: list[str] | None = None) -> FastAPI:
             known_locations_count=meta.get("known_locations_count"),
             metrics={str(k): float(v) for k, v in meta.get("metrics", {}).items()},
         )
+
+    @application.get("/locations", response_model=LocationsResponse, tags=["Model"])
+    def list_locations(state: ModelRegistryState = Depends(get_model_state)) -> LocationsResponse:
+        locations: list[str] = []
+        named_steps = getattr(state.pipeline, "named_steps", {})
+        preprocessor = named_steps.get("preprocessor")
+        if preprocessor is not None and hasattr(preprocessor, "named_steps"):
+            loc_encoder = preprocessor.named_steps.get("location_encoder")
+            target_map = getattr(loc_encoder, "target_map_", None)
+            if isinstance(target_map, dict):
+                locations = sorted(str(city) for city in target_map.keys())
+        return LocationsResponse(count=len(locations), locations=locations)
 
     @application.post("/predict", response_model=HousePredictionResponse, tags=["Prediction"])
     def predict_price(
