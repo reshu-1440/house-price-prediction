@@ -58,3 +58,22 @@ Runtime server parameters (`host`, `port`, `workers`, `log_level`, `cors.allowed
 ```bash
 aws cloudformation delete-stack --stack-name house-price-prediction-prod --region ap-south-1
 ```
+
+---
+
+## 6. Free Deployment (Vercel Frontend + Render Backend + UptimeRobot)
+
+For zero-cost portfolio/demo hosting without AWS charges:
+
+1. **Backend + Model on Render Free (`render.yaml`, `Dockerfile.render`, `requirements-serve.txt`)**:
+   - Uses a slim inference-only image (`requirements-serve.txt`), binds dynamic `${PORT:-8000}`, and runs `--workers 1` to fit within Render Free's **512 MB RAM** limit.
+   - `models/house_price_pipeline.joblib` (~2.02 MB) is allowlisted in `.gitignore` so GitHub auto-deploys include the trained pipeline.
+   - `buildFilter` in `render.yaml` skips backend rebuilds when only `frontend/` changes.
+   - Set `ALLOWED_ORIGINS` in the Render dashboard to your Vercel URL (e.g., `https://your-app.vercel.app`) alongside `APP_ENV=production`.
+2. **Frontend on Vercel (`frontend/vercel.json`)**:
+   - Import the repo in Vercel with **Root Directory** set to `frontend`.
+   - Set environment variable `VITE_API_BASE_URL` to your Render service URL (e.g., `https://house-price-prediction-api.onrender.com`).
+3. **Keep Render Awake with UptimeRobot**:
+   - Create one free HTTP(S) or Keyword monitor in UptimeRobot targeting `https://<your-render-service>.onrender.com/health` at a **5-minute** (free minimum) or **10-minute** interval.
+   - Both `GET /health` and `HEAD /health` return HTTP `200`.
+   - Keeping **1** service awake 24/7 uses ~744 of Render's **750 free monthly instance-hours** per workspace; do not run a second always-awake free web service in the same Render workspace.

@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: house-price-prediction-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile.render
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    buildFilter:
+      paths:
+        - src/**
+        - config/**
+        - models/**
+        - requirements-serve.txt
+        - Dockerfile.render
+        - setup.py
+        - pyproject.toml
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: MODEL_PATH
+        value: /app/models/house_price_pipeline.joblib
+      - key: ALLOWED_ORIGINS
+        sync: false

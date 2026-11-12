@@ -1,0 +1,63 @@
+# Slim single-worker runtime Dockerfile tailored for Render Free (512 MB RAM) and dynamic $PORT.
+# Local full-stack Docker Compose (API + MLflow) continues to use ./Dockerfile.
+
+FROM python:3.13-slim AS builder
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY requirements-serve.txt setup.py pyproject.toml ./
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir setuptools>=75.0.0 wheel>=0.45.0 \
+    && pip install --no-cache-dir -r requirements-serve.txt
+
+COPY src ./src
+RUN pip install --no-deps --no-build-isolation -e .
+
+
+FROM python:3.13-slim AS serve
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH" \
+    APP_ENV="production" \
+    MODEL_PATH="/app/models/house_price_pipeline.joblib" \
+    OMP_NUM_THREADS="1" \
+    OPENBLAS_NUM_THREADS="1"
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgomp1 \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --gid 10001 appuser \
+    && useradd --uid 10001 --gid appuser --shell /bin/false --create-home appuser
+
+COPY --from=builder /opt/venv /opt/venv
+COPY config ./config
+COPY src ./src
+COPY models ./models
+COPY setup.py pyproject.toml ./
+
+RUN chown -R appuser:appuser /app
+
+USER appuser
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD sh -c 'curl -fsS "http://127.0.0.1:${PORT:-8000}/health" || exit 1'
+
+CMD ["sh", "-c", "uvicorn src.api.app:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1 --timeout-keep-alive 30"]

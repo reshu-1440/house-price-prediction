@@ -24,6 +24,7 @@ data/raw/
 data/processed/
 Data/processed/
 models/*.joblib
+!models/house_price_pipeline.joblib
 models/versions/
 mlruns/
 mlflow_experiments/

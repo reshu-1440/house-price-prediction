@@ -16,6 +16,9 @@ def test_health_and_model_info(api_client: TestClient) -> None:
     assert health.json()["status"] == "healthy"
     assert health.json()["model_loaded"] is True
 
+    health_head = api_client.head("/health")
+    assert health_head.status_code == 200
+
     info = api_client.get("/model/info")
     assert info.status_code == 200
     payload = info.json()

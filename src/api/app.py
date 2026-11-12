@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import uvicorn
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Response
 
 from src.api.dependencies import ModelRegistryState, get_model_state, model_state
 from src.api.middleware import configure_middleware
@@ -67,6 +67,11 @@ def create_app(allowed_origins: list[str] | None = None) -> FastAPI:
             model_name=model_state.metadata.get("model_name"),
             model_version=model_state.metadata.get("model_version"),
         )
+
+    @application.head("/health", include_in_schema=False)
+    def health_check_head() -> Response:
+        """Lightweight HEAD probe for external uptime monitors (e.g., UptimeRobot)."""
+        return Response(status_code=200)
 
     @application.get("/model/info", response_model=ModelInfoResponse, tags=["Model"])
     def model_info(state: ModelRegistryState = Depends(get_model_state)) -> ModelInfoResponse:

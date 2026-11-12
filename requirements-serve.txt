@@ -1,0 +1,12 @@
+# Minimal runtime-only dependencies for low-memory API serving (e.g., Render Free 512 MB).
+# Training, HPO, MLflow tracking, plotting, and dev tools remain in requirements.txt.
+numpy>=2.0.0
+pandas>=2.2.0
+PyYAML>=6.0.0
+scipy>=1.14.0
+scikit-learn>=1.6.0
+joblib>=1.4.0
+lightgbm>=4.5.0
+fastapi>=0.115.0
+uvicorn>=0.32.0
+pydantic>=2.9.0
