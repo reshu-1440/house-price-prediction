@@ -43,12 +43,14 @@ import { CitySelector } from "./CitySelector";
 interface SinglePredictorProps {
   cities: string[];
   modelLoaded: boolean;
+  onPredictionSuccess?: (modelName: string, modelVersion: string) => void;
   onBackendReachable?: () => void;
 }
 
 export function SinglePredictor({
   cities,
   modelLoaded,
+  onPredictionSuccess,
   onBackendReachable,
 }: SinglePredictorProps) {
   const [form, setForm] = useState<HousePredictionRequest>({ ...DEFAULT_PREDICTION_REQUEST });
@@ -93,6 +95,7 @@ export function SinglePredictor({
         response: data,
         processTimeMs,
       });
+      onPredictionSuccess?.(data.model_name, data.model_version);
       onBackendReachable?.();
     } catch (err) {
       if (err instanceof ApiError) {
@@ -525,7 +528,7 @@ export function SinglePredictor({
             </div>
           )}
 
-          {!modelLoaded && (
+          {!modelLoaded && !result && (
             <div className="alert-banner alert-warn" role="status">
               <AlertCircle size={18} />
               <span>

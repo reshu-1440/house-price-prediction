@@ -21,13 +21,38 @@ export function App() {
   const [cities, setCities] = useState<string[]>(FALLBACK_TRAINED_CITIES);
   const [statusError, setStatusError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [wakingUp, setWakingUp] = useState(false);
 
-  const loadStatus = useCallback(async () => {
-    setRefreshing(true);
+  const markBackendOnline = useCallback((modelName?: string, modelVersion?: string) => {
+    setHealth((prev) => ({
+      status: "healthy",
+      model_loaded: true,
+      model_name: modelName ?? prev?.model_name ?? "lightgbm",
+      model_version: modelVersion ?? prev?.model_version ?? "0.1.0",
+    }));
     setStatusError(null);
+    setWakingUp(false);
+
+    void Promise.allSettled([fetchModelInfo(), fetchLocations()]).then(([infoRes, locRes]) => {
+      if (infoRes.status === "fulfilled") {
+        setModelInfo(infoRes.value);
+      }
+      if (locRes.status === "fulfilled" && locRes.value.locations.length > 0) {
+        setCities(locRes.value.locations);
+      }
+    });
+  }, []);
+
+  const loadStatus = useCallback(async (retryCount = 0) => {
+    setRefreshing(true);
+    if (retryCount === 0) {
+      setStatusError(null);
+    }
     try {
       const h = await fetchHealth();
       setHealth(h);
+      setWakingUp(false);
+      setStatusError(null);
 
       if (h.model_loaded) {
         const [infoRes, locRes] = await Promise.allSettled([
@@ -45,13 +70,24 @@ export function App() {
         setModelInfo(null);
       }
     } catch (err) {
-      setHealth(null);
-      setModelInfo(null);
-      setStatusError(
-        err instanceof ApiError
-          ? err.message
-          : "Backend API is unreachable right now. Click Refresh in a moment.",
-      );
+      if (retryCount < 6) {
+        setWakingUp(true);
+        setStatusError(
+          "Backend is waking up from idle on Render (~20–40s on free tier). Connecting automatically...",
+        );
+        setTimeout(() => {
+          void loadStatus(retryCount + 1);
+        }, 4000);
+      } else {
+        setHealth(null);
+        setModelInfo(null);
+        setWakingUp(false);
+        setStatusError(
+          err instanceof ApiError
+            ? err.message
+            : "Backend API is unreachable right now. Click Refresh in a moment.",
+        );
+      }
     } finally {
       setRefreshing(false);
     }
@@ -88,23 +124,27 @@ export function App() {
               className={`status-pill ${
                 health?.status === "healthy"
                   ? "pill-ok"
-                  : health?.status === "degraded"
+                  : wakingUp
                     ? "pill-warn"
-                    : "pill-offline"
+                    : health?.status === "degraded"
+                      ? "pill-warn"
+                      : "pill-offline"
               }`}
             >
               <span className="dot" />
               {health?.status === "healthy"
                 ? `Connected · ${health.model_name ?? "model"} v${health.model_version ?? "?"}`
-                : health?.status === "degraded"
-                  ? "Model Not Loaded"
-                  : "API Offline"}
+                : wakingUp
+                  ? "Waking up server..."
+                  : health?.status === "degraded"
+                    ? "Model Not Loaded"
+                    : "API Offline"}
             </span>
 
             <button
               type="button"
               className="ghost-btn"
-              onClick={() => void loadStatus()}
+              onClick={() => void loadStatus(0)}
               disabled={refreshing}
             >
               <RefreshCw size={14} className={refreshing ? "spin" : ""} />
@@ -143,7 +183,7 @@ export function App() {
 
       <main className="main-content">
         {statusError && (
-          <div className="alert-banner alert-warn global-banner">
+          <div className={`alert-banner ${wakingUp ? "alert-warn" : "alert-warn"} global-banner`}>
             <span>{statusError}</span>
           </div>
         )}
@@ -152,6 +192,7 @@ export function App() {
           <SinglePredictor
             cities={cities}
             modelLoaded={modelLoaded}
+            onPredictionSuccess={markBackendOnline}
             onBackendReachable={handleBackendReachable}
           />
         )}
@@ -159,6 +200,7 @@ export function App() {
           <BatchPredictor
             cities={cities}
             modelLoaded={modelLoaded}
+            onPredictionSuccess={markBackendOnline}
             onBackendReachable={handleBackendReachable}
           />
         )}

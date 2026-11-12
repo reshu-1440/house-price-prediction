@@ -46,14 +46,20 @@ function parseErrorDetail(body: unknown, fallbackStatus: number): string {
 
 async function requestJson<T>(path: string, init?: RequestInit): Promise<PredictionWithTiming<T>> {
   const url = `${API_BASE_URL}${path}`;
+  const method = (init?.method ?? "GET").toUpperCase();
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    ...((init?.headers as Record<string, string>) ?? {}),
+  };
+  if (method !== "GET" && method !== "HEAD") {
+    headers["Content-Type"] = "application/json";
+  }
+
   let response: Response;
   try {
     response = await fetch(url, {
       ...init,
-      headers: {
-        "Content-Type": "application/json",
-        ...(init?.headers ?? {}),
-      },
+      headers,
     });
   } catch {
     const hint =
