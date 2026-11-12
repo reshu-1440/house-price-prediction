@@ -22,6 +22,7 @@ An end-to-end machine learning engineering workflow to predict residential prope
 - `config/` — Central YAML configuration (`config.yaml`, `hyperparameters.yaml`, `production.yaml`, `monitoring_thresholds.yaml`, `retraining.yaml`)
 - `Data/data_download.py` — Automated Kaggle dataset downloader staging `Data/house_prices.csv` (raw CSV is gitignored because it exceeds GitHub's 100 MB limit)
 - `src/` — Modular ML engineering package (`utils/`, `data/`, `features/`, `models/`, `pipeline/`, `api/`, `monitoring/`, `retraining/`)
+- `frontend/` — React + Vite + TypeScript SPA aligned 1:1 with the FastAPI schemas (`POST /predict`, `POST /predict/batch`, `GET /model/info`, `GET /locations`, `GET /health`)
 - `tests/` — Unit, integration, and model quality/fairness tests (`pytest`)
 - `infrastructure/`, `scripts/`, `Dockerfile`, `docker-compose.yml`, `.github/workflows/` — Containerization, CI/CD, and AWS ECS deployment
 
@@ -34,22 +35,25 @@ An end-to-end machine learning engineering workflow to predict residential prope
 On Windows, you can run the full setup/training pipeline and launch the server with two root batch scripts:
 
 ```bat
-:: 1. Create .venv, install dependencies, download dataset, run EDA, split,
-::    benchmark models, tune hyperparameters, evaluate, log to MLflow,
-::    serialize models\house_price_pipeline.joblib, and run ruff + pytest:
+:: 1. One-time setup after cloning: create .venv, install Python + frontend deps,
+::    download dataset, train & evaluate models, log to MLflow, serialize pipeline,
+::    and verify ruff + pytest + vitest + vite build:
 setup.bat
 
 :: Optional faster re-run skipping Optuna/RandomizedSearchCV tuning:
 setup.bat --skip-tune
 
-:: 2. Start the FastAPI inference server (http://127.0.0.1:8000/docs):
+:: 2. Verify all installations/model and start Backend + Frontend together
+::    (automatically waits for API health and opens http://127.0.0.1:5173):
 start.bat
 
 :: Optional modes for start.bat:
-start.bat --open        :: Start FastAPI and open Swagger UI in your browser
-start.bat --mlflow      :: Launch MLflow Tracking UI (http://127.0.0.1:5000)
-start.bat --dashboard   :: Open reports\monitoring\monitoring_dashboard.html
-start.bat --docker      :: Build and start API + MLflow via Docker Compose
+start.bat --check-only        :: Verify Python, model, and frontend installs only
+start.bat --api --open        :: Start FastAPI only and open Swagger UI (/docs)
+start.bat --frontend          :: Start React/Vite frontend only (http://127.0.0.1:5173)
+start.bat --mlflow --open     :: Launch MLflow Tracking UI (http://127.0.0.1:5000)
+start.bat --dashboard         :: Open reports\monitoring\monitoring_dashboard.html
+start.bat --docker            :: Build and start API + MLflow via Docker Compose
 ```
 
 ### Option A — Run Tests, Lint & Container Build (No Dataset Required)

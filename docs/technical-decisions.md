@@ -87,3 +87,10 @@
 - **Context**: GitHub rejected `git push origin main` (`GH001`) because `Data/house_prices.csv` (`101.05 MiB` blob) exceeded GitHub's `100.00 MB` file size limit. Tracking it in Git LFS would require `git-lfs` on every collaborator/CI environment and consume GitHub Free's `1 GB/month` LFS bandwidth quota. Meanwhile, all `pytest` tests and Docker runtime builds already execute without `Data/house_prices.csv`.
 - **Decision**: Strip `Data/house_prices.csv` from Git commit history, add `Data/house_prices.csv` and `data/raw/` to `.gitignore`, and enhance `Data/data_download.py` so running `python Data/data_download.py` (or `make download-data`) automatically downloads `juhibhojani/house-price` via `kagglehub` and places `Data/house_prices.csv` locally without overwriting an existing copy unless `--force` is passed.
 - **Consequences**: Repository shrinks to ~7 MiB and pushes cleanly to GitHub with zero LFS quota dependency; tests, ruff, and CI Docker builds work out of the box without the dataset, while teammates fetch the full dataset in one command before training.
+
+## TD-013: Build React + Vite + TypeScript Frontend Aligned 1:1 with FastAPI & Trained Pipeline
+- **Date**: 2026-11-12 (Post-Phase 16)
+- **Status**: Accepted
+- **Context**: After completing Phases 0–16, the project exposed FastAPI endpoints (`/health`, `/model/info`, `/predict`, `/predict/batch`) and Swagger UI without a user-facing web frontend.
+- **Decision**: Add a standalone React + Vite + TypeScript SPA under `frontend/` strictly aligned with `HousePredictionRequest` and the trained LightGBM pipeline (`src/features/transformers.py`), add `GET /locations` in `src/api/app.py` to serve the model's learned `LocationEncoder` city list, enable Vite dev CORS/header exposure (`X-Process-Time-Ms`) in `src/api/middleware.py`, and add `--frontend` / `--fullstack` modes to `start.bat`.
+- **Consequences**: Users can run single-property estimations, CSV batch predictions (up to 500 rows), and live model inspection without leaving the browser, with zero fabricated fields or target leakage (`Price (in rupees)` never exposed).

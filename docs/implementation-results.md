@@ -336,3 +336,26 @@
   - Largest Git blob in `refs/heads/main`: `0.23 MB` (`reports/figures/actual_vs_predicted.png`)
   - `python -m ruff check Data/data_download.py src tests`: `All checks passed!`
   - `python -m pytest -v`: `49 passed` (`46` unit/model/training-flow tests + `3` FastAPI `TestClient` integration tests) without requiring `Data/house_prices.csv` in Git.
+
+---
+
+## Post-Phase 16 — React + Vite + TypeScript Frontend (`TD-013`)
+
+- **Status**: `Completed`
+- **Deliverables Created/Updated**:
+  - `frontend/` (`package.json`, `vite.config.ts`, `tsconfig.json`, `index.html`, `.env.example`, `src/types/api.ts`, `src/constants/modelOptions.ts`, `src/services/apiClient.ts`, `src/utils/{validation,csv,validation.test}.ts`, `src/components/{CitySelector,SinglePredictor,BatchPredictor,ModelInsights}.tsx`, `src/{App,main,vite-env.d}.tsx|ts`, `src/index.css`)
+  - `src/api/schemas.py`, `src/api/app.py`: added `LocationsResponse` and `GET /locations` serving the active `LocationEncoder` city list
+  - `src/api/middleware.py`: added Vite dev origins (`5173`, `3000`) and exposed `X-Process-Time-Ms` header
+  - `tests/integration/test_api.py`: added `/locations` integration assertions
+  - `start.bat`: added `--frontend`, `--fullstack` (new default with pre-flight install/artifact checks, auto-port fallback via `scripts/resolve_port.py`, and browser auto-open)
+  - `setup.bat`: added Python/Node/npm dependency checks (`--force-install`) and frontend test/build verification
+  - `scripts/resolve_port.py` & `tests/unit/test_resolve_port.py`: automatic backend (`8000..8020`) and frontend (`5173..5193`) port resolution with `VITE_API_PROXY_TARGET` wiring in `frontend/vite.config.ts`
+  - `.gitignore`, `README.md`, `docs/{api-documentation,architecture,setup-guide,technical-decisions}.md`, `agents/decision-log.md`
+- **Verification**:
+  - `python -m ruff check Data/data_download.py scripts/resolve_port.py src tests`: `All checks passed!`
+  - `python -m pytest -v`: `49 passed` + `tests/unit/test_resolve_port.py`: `2 passed`
+  - `npm --prefix frontend run test`: `6 passed` (`vitest`)
+  - `npm --prefix frontend run typecheck`: exited `0` (`tsc -b --noEmit`)
+  - `npm --prefix frontend run build`: exited `0` (`vite build`, `dist/` generated)
+  - `start.bat --check-only --no-pause`: exited `0`
+  - Live Vite proxy probe on fallback ports (`5174` -> `8001` via `VITE_API_PROXY_TARGET`): `/api/health` -> `healthy`, `/api/predict` -> `₹1.52 Cr`

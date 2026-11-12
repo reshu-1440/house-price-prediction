@@ -10,6 +10,7 @@
 |--------|------|---------|--------------|
 | `GET` | `/health` | Service liveness, loaded model status, model name & version | `200` |
 | `GET` | `/model/info` | Active model metadata, feature count, known city count, evaluation metrics | `200`, `503` |
+| `GET` | `/locations` | Sorted list of city slugs learned by the active model's `LocationEncoder` | `200`, `503` |
 | `POST` | `/predict` | Single property price prediction from validated attributes | `200`, `422`, `503` |
 | `POST` | `/predict/batch` | Bounded batch predictions (`1..500` items per request) | `200`, `422`, `503` |
 

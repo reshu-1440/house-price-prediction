@@ -60,6 +60,7 @@ All planned engineering layers (Phases 0–16) are implemented in `src/`, `confi
 | Models & Tracking | `src/models/` | Training, HPO, evaluation metrics/plots, MLflow tracking/registry | `src/features`, `src/utils`, ML libs |
 | Pipelines | `src/pipeline/` | End-to-end preprocessing+model training & raw-input inference pipelines | `src/data`, `src/features`, `src/models` |
 | Backend API | `src/api/` | FastAPI app, Pydantic schemas, middleware, model dependency lifecycle | `src/pipeline`, `fastapi`, `pydantic` |
+| Frontend SPA | `frontend/` | React + Vite + TypeScript UI aligned with `HousePredictionRequest`, `/predict`, `/predict/batch`, `/model/info`, `/locations`, `/health` | FastAPI REST API (`/api` proxy or `VITE_API_BASE_URL`) |
 | Monitoring | `src/monitoring/` | Data drift (KS/PSI), prediction drift, performance tracking, alerts | `src/utils`, `scipy`, `pandas` |
 | Retraining | `src/retraining/` | Trigger evaluation, champion/challenger comparison, approval, versioning/rollback | `src/pipeline`, `src/monitoring`, `src/models` |
 | Tests | `tests/` | Unit (`tests/unit`), integration (`tests/integration`), model quality (`tests/model`) | `pytest` + target `src/` modules |
