@@ -2,11 +2,21 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
+import joblib
 import numpy as np
 import pandas as pd
 from sklearn.pipeline import Pipeline
+
+
+def load_pipeline(path: str | Path) -> Pipeline:
+    """Load a serialized joblib pipeline artifact from disk."""
+    target = Path(path)
+    if not target.exists():
+        raise FileNotFoundError(f"Pipeline artifact not found: {target}")
+    return joblib.load(target)
 
 
 def predict_from_raw(

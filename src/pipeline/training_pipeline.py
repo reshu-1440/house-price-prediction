@@ -37,6 +37,7 @@ from src.features.transformers import (
 )
 from src.models.evaluate import compute_metrics
 from src.models.hyperparameter_tuning import _build_gb_regressor
+from src.pipeline.inference_pipeline import load_pipeline as load_pipeline
 from src.utils.config import get_logger, load_config, resolve_path
 
 logger = get_logger(__name__)
@@ -94,14 +95,6 @@ def save_pipeline(
         logger.info("Saved pipeline metadata to %s", meta_path)
 
     return target
-
-
-def load_pipeline(path: str | Path) -> Pipeline:
-    """Load a serialized joblib pipeline artifact from disk."""
-    target = Path(path)
-    if not target.exists():
-        raise FileNotFoundError(f"Pipeline artifact not found: {target}")
-    return joblib.load(target)
 
 
 def run_training_pipeline(

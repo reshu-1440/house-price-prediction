@@ -10,7 +10,7 @@ from typing import Any
 
 from fastapi import HTTPException, status
 
-from src.pipeline.training_pipeline import load_pipeline
+from src.pipeline.inference_pipeline import load_pipeline
 from src.utils.config import get_logger, load_config, resolve_path
 
 logger = get_logger(__name__)
