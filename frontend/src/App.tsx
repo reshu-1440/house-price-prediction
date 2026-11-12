@@ -50,7 +50,7 @@ export function App() {
       setStatusError(
         err instanceof ApiError
           ? err.message
-          : "Backend API is unreachable. Run start.bat in the project root.",
+          : "Backend API is unreachable right now. Click Refresh in a moment.",
       );
     } finally {
       setRefreshing(false);
@@ -60,6 +60,12 @@ export function App() {
   useEffect(() => {
     void loadStatus();
   }, [loadStatus]);
+
+  const handleBackendReachable = useCallback(() => {
+    if (health?.status !== "healthy" || !health.model_loaded) {
+      void loadStatus();
+    }
+  }, [health, loadStatus]);
 
   const modelLoaded = Boolean(health?.model_loaded);
 
@@ -143,10 +149,18 @@ export function App() {
         )}
 
         {activeTab === "single" && (
-          <SinglePredictor cities={cities} modelLoaded={modelLoaded} />
+          <SinglePredictor
+            cities={cities}
+            modelLoaded={modelLoaded}
+            onBackendReachable={handleBackendReachable}
+          />
         )}
         {activeTab === "batch" && (
-          <BatchPredictor cities={cities} modelLoaded={modelLoaded} />
+          <BatchPredictor
+            cities={cities}
+            modelLoaded={modelLoaded}
+            onBackendReachable={handleBackendReachable}
+          />
         )}
         {activeTab === "insights" && (
           <ModelInsights

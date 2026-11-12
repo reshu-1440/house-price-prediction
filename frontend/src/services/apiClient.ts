@@ -56,10 +56,11 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<Predict
       },
     });
   } catch {
-    throw new ApiError(
-      0,
-      "Unable to reach FastAPI server. Make sure the backend is running (start.bat) on port 8000.",
-    );
+    const hint =
+      API_BASE_URL === "/api"
+        ? "Unable to reach FastAPI server. Make sure the backend is running (start.bat) on port 8000."
+        : `Unable to reach API server (${API_BASE_URL}). It may be waking up — wait a few seconds and click Refresh.`;
+    throw new ApiError(0, hint);
   }
 
   const rawTiming = response.headers.get("X-Process-Time-Ms");

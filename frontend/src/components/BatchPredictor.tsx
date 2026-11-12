@@ -22,6 +22,7 @@ import {
 interface BatchPredictorProps {
   cities: string[];
   modelLoaded: boolean;
+  onBackendReachable?: () => void;
 }
 
 function downloadTextFile(filename: string, content: string, mimeType: string) {
@@ -34,7 +35,11 @@ function downloadTextFile(filename: string, content: string, mimeType: string) {
   URL.revokeObjectURL(url);
 }
 
-export function BatchPredictor({ cities, modelLoaded }: BatchPredictorProps) {
+export function BatchPredictor({
+  cities,
+  modelLoaded,
+  onBackendReachable,
+}: BatchPredictorProps) {
   const [items, setItems] = useState<HousePredictionRequest[]>([
     { ...DEFAULT_PREDICTION_REQUEST },
     {
@@ -119,6 +124,7 @@ export function BatchPredictor({ cities, modelLoaded }: BatchPredictorProps) {
     try {
       const res = await predictBatch({ items: sanitized });
       setPredictions(res.data.predictions);
+      onBackendReachable?.();
     } catch (err) {
       if (err instanceof ApiError) {
         setApiError(err.message);

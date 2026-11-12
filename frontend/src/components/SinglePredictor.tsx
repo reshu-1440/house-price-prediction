@@ -43,9 +43,14 @@ import { CitySelector } from "./CitySelector";
 interface SinglePredictorProps {
   cities: string[];
   modelLoaded: boolean;
+  onBackendReachable?: () => void;
 }
 
-export function SinglePredictor({ cities, modelLoaded }: SinglePredictorProps) {
+export function SinglePredictor({
+  cities,
+  modelLoaded,
+  onBackendReachable,
+}: SinglePredictorProps) {
   const [form, setForm] = useState<HousePredictionRequest>({ ...DEFAULT_PREDICTION_REQUEST });
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [submittedOnce, setSubmittedOnce] = useState(false);
@@ -88,6 +93,7 @@ export function SinglePredictor({ cities, modelLoaded }: SinglePredictorProps) {
         response: data,
         processTimeMs,
       });
+      onBackendReachable?.();
     } catch (err) {
       if (err instanceof ApiError) {
         setApiError(err.message);
@@ -523,7 +529,7 @@ export function SinglePredictor({ cities, modelLoaded }: SinglePredictorProps) {
             <div className="alert-banner alert-warn" role="status">
               <AlertCircle size={18} />
               <span>
-                Backend API is offline or model is not loaded. Start it with start.bat.
+                Backend status is offline or waking up. Click Refresh once the server is ready.
               </span>
             </div>
           )}
