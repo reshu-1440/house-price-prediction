@@ -2,8 +2,10 @@
 setlocal EnableExtensions EnableDelayedExpansion
 
 rem ============================================================================
-rem setup.bat - Complete environment setup, data download, training, MLflow
-rem             tracking, pipeline serialization, and verification for Windows.
+rem setup.bat - One-time complete environment setup for House Price Prediction:
+rem             Python .venv + dependencies, React/Vite frontend dependencies,
+rem             Kaggle dataset download, training pipeline, MLflow tracking,
+rem             model serialization, and full Python + Frontend verification.
 rem ============================================================================
 
 cd /d "%~dp0"
@@ -14,6 +16,7 @@ set "PYTHONIOENCODING=utf-8"
 set "MLFLOW_DISABLE_AGENT_HINT=1"
 
 set "SKIP_INSTALL=0"
+set "FORCE_INSTALL=0"
 set "SKIP_TUNE=0"
 set "SKIP_TESTS=0"
 set "NO_PAUSE=0"
@@ -26,6 +29,11 @@ for %%A in (%*) do (
 if "%~1"=="" goto :args_done
 if /i "%~1"=="--skip-install" (
     set "SKIP_INSTALL=1"
+    shift
+    goto :parse_args
+)
+if /i "%~1"=="--force-install" (
+    set "FORCE_INSTALL=1"
     shift
     goto :parse_args
 )
@@ -55,14 +63,18 @@ goto :fail
 echo.
 echo Usage: setup.bat [OPTIONS]
 echo.
-echo Runs complete project setup, dataset download, EDA, data splitting,
-echo model training, hyperparameter tuning, evaluation, MLflow logging,
-echo production pipeline serialization, linting, and tests.
+echo One-time setup after cloning the repository:
+echo   - Creates .venv and installs missing Python packages (requirements.txt + -e .)
+echo   - Verifies Node.js/npm and installs frontend\node_modules
+echo   - Downloads Data\house_prices.csv (if missing) and runs full ML training
+echo   - Logs runs to MLflow and serializes models\house_price_pipeline.joblib
+echo   - Runs Python (ruff + pytest) and Frontend (vitest + tsc + vite build) checks
 echo.
 echo Options:
-echo   --skip-install   Skip pip install steps (use existing .venv packages)
+echo   --skip-install   Skip Python and npm install checks
+echo   --force-install  Reinstall all Python and npm dependencies even if present
 echo   --skip-tune      Skip Optuna/RandomizedSearchCV tuning if hyperparameters.yaml exists
-echo   --skip-tests     Skip ruff lint and pytest verification checks
+echo   --skip-tests     Skip ruff, pytest, vitest, and vite build checks
 echo   --no-pause       Do not pause for keypress at completion or on error
 echo   --help, -h       Show this help message and exit
 echo.
@@ -70,15 +82,15 @@ exit /b 0
 
 :args_done
 echo ============================================================================
-echo   House Price Prediction - Complete Setup ^& Training Pipeline
+echo   House Price Prediction - One-Time Full Environment Setup
 echo ============================================================================
 echo Working directory: "%CD%"
 echo.
 
 rem ----------------------------------------------------------------------------
-rem [1/11] Create or reuse Python virtual environment (.venv)
+rem [1/13] Create or reuse Python virtual environment (.venv)
 rem ----------------------------------------------------------------------------
-echo [1/11] Checking Python virtual environment (.venv)...
+echo [1/13] Checking Python virtual environment (.venv)...
 if not exist ".venv\Scripts\python.exe" (
     echo Creating .venv virtual environment...
     set "BASE_PYTHON="
@@ -107,33 +119,93 @@ if not exist ".venv\Scripts\python.exe" (
 )
 
 set "VENV_PYTHON=%CD%\.venv\Scripts\python.exe"
-for /f "delims=" %%V in ('"%VENV_PYTHON%" --version 2^>^&1') do echo Using %%V ^(%VENV_PYTHON%^)
+for /f "delims=" %%V in ('"%VENV_PYTHON%" --version 2^>^&1') do echo [OK] Using %%V ^(%VENV_PYTHON%^)
 echo.
 
 rem ----------------------------------------------------------------------------
-rem [2/11] Install dependencies and editable package
+rem [2/13] Check and install Python dependencies (requirements.txt + editable pkg)
 rem ----------------------------------------------------------------------------
+echo [2/13] Checking Python dependencies...
 if "%SKIP_INSTALL%"=="1" (
-    echo [2/11] Skipping dependency installation ^(--skip-install^).
+    echo [SKIP] Skipping Python dependency installation ^(--skip-install^).
 ) else (
-    echo [2/11] Installing dependencies from requirements.txt and editable package...
-    "%VENV_PYTHON%" -m pip install -r requirements.txt
-    if errorlevel 1 (
-        echo [ERROR] Failed to install packages from requirements.txt.
-        goto :fail
+    set "NEED_PY_INSTALL=0"
+    if "%FORCE_INSTALL%"=="1" (
+        set "NEED_PY_INSTALL=1"
+    ) else (
+        "%VENV_PYTHON%" -c "import importlib.metadata, fastapi, uvicorn, pydantic, httpx, joblib, pandas, numpy, scipy, sklearn, lightgbm, xgboost, optuna, mlflow, yaml, matplotlib, seaborn, kagglehub, pytest, ruff; importlib.metadata.version('house-price-prediction')" >nul 2>&1
+        if errorlevel 1 set "NEED_PY_INSTALL=1"
     )
-    "%VENV_PYTHON%" -m pip install --no-build-isolation --no-deps -e .
-    if errorlevel 1 (
-        echo [ERROR] Failed to install local package in editable mode.
-        goto :fail
+    if "!NEED_PY_INSTALL!"=="1" (
+        echo Installing missing Python packages from requirements.txt and editable package...
+        "%VENV_PYTHON%" -m pip install -r requirements.txt
+        if errorlevel 1 (
+            echo [ERROR] Failed to install packages from requirements.txt.
+            goto :fail
+        )
+        "%VENV_PYTHON%" -m pip install --no-build-isolation --no-deps -e .
+        if errorlevel 1 (
+            echo [ERROR] Failed to install local package in editable mode.
+            goto :fail
+        )
+        echo [OK] Python dependencies installed.
+    ) else (
+        echo [OK] All Python dependencies and editable package are already installed.
     )
 )
 echo.
 
 rem ----------------------------------------------------------------------------
-rem [3/11] Download and verify raw dataset (Data\house_prices.csv)
+rem [3/13] Check Node.js/npm and install Frontend dependencies
 rem ----------------------------------------------------------------------------
-echo [3/11] Downloading and verifying raw dataset ^(Data\house_prices.csv^)...
+echo [3/13] Checking Node.js and React frontend dependencies...
+where node >nul 2>&1
+if errorlevel 1 (
+    echo [ERROR] Node.js was not found on PATH.
+    echo Install Node.js LTS from https://nodejs.org/ and re-run setup.bat.
+    goto :fail
+)
+where npm >nul 2>&1
+if errorlevel 1 (
+    echo [ERROR] npm was not found on PATH.
+    goto :fail
+)
+for /f "delims=" %%N in ('node -v 2^>^&1') do echo [OK] Node.js %%N detected.
+
+if not exist "frontend\package.json" (
+    echo [ERROR] Frontend manifest missing at "frontend\package.json".
+    goto :fail
+)
+
+if "%SKIP_INSTALL%"=="1" (
+    echo [SKIP] Skipping frontend dependency installation ^(--skip-install^).
+) else (
+    set "NEED_FE_INSTALL=0"
+    if "%FORCE_INSTALL%"=="1" set "NEED_FE_INSTALL=1"
+    if not exist "frontend\node_modules\vite\bin\vite.js" set "NEED_FE_INSTALL=1"
+    if not exist "frontend\node_modules\react\package.json" set "NEED_FE_INSTALL=1"
+    if not exist "frontend\node_modules\lucide-react\package.json" set "NEED_FE_INSTALL=1"
+    if not exist "frontend\node_modules\typescript\bin\tsc" set "NEED_FE_INSTALL=1"
+    if not exist "frontend\node_modules\vitest\vitest.mjs" set "NEED_FE_INSTALL=1"
+
+    if "!NEED_FE_INSTALL!"=="1" (
+        echo Installing frontend npm packages in frontend\...
+        call npm --prefix frontend install
+        if errorlevel 1 (
+            echo [ERROR] Failed to install frontend npm dependencies.
+            goto :fail
+        )
+        echo [OK] Frontend dependencies installed.
+    ) else (
+        echo [OK] All frontend dependencies are already installed.
+    )
+)
+echo.
+
+rem ----------------------------------------------------------------------------
+rem [4/13] Download and verify raw dataset (Data\house_prices.csv)
+rem ----------------------------------------------------------------------------
+echo [4/13] Checking and verifying raw dataset ^(Data\house_prices.csv^)...
 "%VENV_PYTHON%" Data\data_download.py
 if errorlevel 1 (
     echo [ERROR] Dataset download failed.
@@ -149,9 +221,9 @@ if errorlevel 1 (
 echo.
 
 rem ----------------------------------------------------------------------------
-rem [4/11] Exploratory Data Analysis (EDA)
+rem [5/13] Exploratory Data Analysis (EDA)
 rem ----------------------------------------------------------------------------
-echo [4/11] Running Exploratory Data Analysis ^(notebooks\01_eda.py^)...
+echo [5/13] Running Exploratory Data Analysis ^(notebooks\01_eda.py^)...
 "%VENV_PYTHON%" notebooks\01_eda.py
 if errorlevel 1 (
     echo [ERROR] EDA pipeline failed.
@@ -160,9 +232,9 @@ if errorlevel 1 (
 echo.
 
 rem ----------------------------------------------------------------------------
-rem [5/11] Data cleaning, stratified splitting, and leakage checks
+rem [6/13] Data cleaning, stratified splitting, and leakage checks
 rem ----------------------------------------------------------------------------
-echo [5/11] Cleaning dataset and creating leakage-safe train/test splits...
+echo [6/13] Cleaning dataset and creating leakage-safe train/test splits...
 "%VENV_PYTHON%" -m src.data.split
 if errorlevel 1 (
     echo [ERROR] Data splitting and leakage verification failed.
@@ -171,9 +243,9 @@ if errorlevel 1 (
 echo.
 
 rem ----------------------------------------------------------------------------
-rem [6/11] Train and benchmark candidate regression models
+rem [7/13] Train and benchmark candidate regression models
 rem ----------------------------------------------------------------------------
-echo [6/11] Training and comparing baseline and ensemble models...
+echo [7/13] Training and comparing baseline and ensemble models...
 "%VENV_PYTHON%" -m src.models.train
 if errorlevel 1 (
     echo [ERROR] Model comparison training failed.
@@ -182,13 +254,13 @@ if errorlevel 1 (
 echo.
 
 rem ----------------------------------------------------------------------------
-rem [7/11] Hyperparameter optimization (Optuna + RandomizedSearchCV)
+rem [8/13] Hyperparameter optimization (Optuna + RandomizedSearchCV)
 rem ----------------------------------------------------------------------------
 if "%SKIP_TUNE%"=="1" (
     if exist "config\hyperparameters.yaml" (
-        echo [7/11] Skipping hyperparameter tuning ^(--skip-tune; using config\hyperparameters.yaml^).
+        echo [8/13] Skipping hyperparameter tuning ^(--skip-tune; using config\hyperparameters.yaml^).
     ) else (
-        echo [7/11] config\hyperparameters.yaml missing; running hyperparameter tuning...
+        echo [8/13] config\hyperparameters.yaml missing; running hyperparameter tuning...
         "%VENV_PYTHON%" -m src.models.hyperparameter_tuning
         if errorlevel 1 (
             echo [ERROR] Hyperparameter tuning failed.
@@ -196,7 +268,7 @@ if "%SKIP_TUNE%"=="1" (
         )
     )
 ) else (
-    echo [7/11] Running hyperparameter tuning ^(Optuna + 3-fold CV^)...
+    echo [8/13] Running hyperparameter tuning ^(Optuna + 3-fold CV^)...
     "%VENV_PYTHON%" -m src.models.hyperparameter_tuning
     if errorlevel 1 (
         echo [ERROR] Hyperparameter tuning failed.
@@ -206,9 +278,9 @@ if "%SKIP_TUNE%"=="1" (
 echo.
 
 rem ----------------------------------------------------------------------------
-rem [8/11] Full model evaluation, residual diagnostics, and error segmentation
+rem [9/13] Full model evaluation, residual diagnostics, and error segmentation
 rem ----------------------------------------------------------------------------
-echo [8/11] Evaluating tuned champion model and generating diagnostic plots...
+echo [9/13] Evaluating tuned champion model and generating diagnostic plots...
 "%VENV_PYTHON%" -m src.models.evaluate
 if errorlevel 1 (
     echo [ERROR] Model evaluation failed.
@@ -217,9 +289,9 @@ if errorlevel 1 (
 echo.
 
 rem ----------------------------------------------------------------------------
-rem [9/11] MLflow experiment tracking and @production model registry
+rem [10/13] MLflow experiment tracking and @production model registry
 rem ----------------------------------------------------------------------------
-echo [9/11] Logging runs to MLflow and registering @production model...
+echo [10/13] Logging runs to MLflow and registering @production model...
 "%VENV_PYTHON%" -m src.models.mlflow_tracking
 if errorlevel 1 (
     echo [ERROR] MLflow tracking and registration failed.
@@ -228,9 +300,9 @@ if errorlevel 1 (
 echo.
 
 rem ----------------------------------------------------------------------------
-rem [10/11] Build and serialize end-to-end production ML pipeline
+rem [11/13] Build and serialize end-to-end production ML pipeline
 rem ----------------------------------------------------------------------------
-echo [10/11] Training and serializing production pipeline ^(models\house_price_pipeline.joblib^)...
+echo [11/13] Training and serializing production pipeline ^(models\house_price_pipeline.joblib^)...
 "%VENV_PYTHON%" -m src.pipeline.training_pipeline
 if errorlevel 1 (
     echo [ERROR] Production training pipeline failed.
@@ -239,12 +311,12 @@ if errorlevel 1 (
 echo.
 
 rem ----------------------------------------------------------------------------
-rem [11/11] Code lint and automated test verification
+rem [12/13] Python lint and automated test verification
 rem ----------------------------------------------------------------------------
 if "%SKIP_TESTS%"=="1" (
-    echo [11/11] Skipping lint and pytest checks ^(--skip-tests^).
+    echo [12/13] Skipping Python lint and pytest checks ^(--skip-tests^).
 ) else (
-    echo [11/11] Running ruff lint checks and pytest test suite...
+    echo [12/13] Running ruff lint checks and pytest test suite...
     "%VENV_PYTHON%" -m ruff check Data\data_download.py src tests
     if errorlevel 1 (
         echo [ERROR] Ruff lint checks failed.
@@ -258,17 +330,39 @@ if "%SKIP_TESTS%"=="1" (
 )
 echo.
 
+rem ----------------------------------------------------------------------------
+rem [13/13] Frontend tests, TypeScript check, and Vite build verification
+rem ----------------------------------------------------------------------------
+if "%SKIP_TESTS%"=="1" (
+    echo [13/13] Skipping frontend verification ^(--skip-tests^).
+) else (
+    echo [13/13] Running frontend unit tests, typecheck, and Vite production build...
+    call npm --prefix frontend run test
+    if errorlevel 1 (
+        echo [ERROR] Frontend Vitest unit tests failed.
+        goto :fail
+    )
+    call npm --prefix frontend run build
+    if errorlevel 1 (
+        echo [ERROR] Frontend TypeScript / Vite build failed.
+        goto :fail
+    )
+)
+echo.
+
 echo ============================================================================
-echo   SETUP AND COMPLETE TRAINING FINISHED SUCCESSFULLY
+echo   SETUP AND VERIFICATION FINISHED SUCCESSFULLY
 echo ============================================================================
-echo Generated Artifacts:
+echo Verified Environment ^& Artifacts:
+echo   - Python Virtual Env  : .venv\Scripts\python.exe
+echo   - Frontend Modules    : frontend\node_modules ^& frontend\dist
 echo   - Serialized Pipeline : models\house_price_pipeline.joblib
 echo   - Model Metadata      : models\metadata.json
 echo   - Processed Splits    : data\processed\train.csv, data\processed\test.csv
 echo   - MLflow Store        : mlflow_experiments\mlflow.db
 echo   - Reports ^& Figures   : reports\
 echo.
-echo Next step: Run start.bat to launch the FastAPI prediction server.
+echo Next step: Simply run "start.bat" anytime to verify and launch the full app.
 echo ============================================================================
 if "%NO_PAUSE%"=="0" pause
 exit /b 0
